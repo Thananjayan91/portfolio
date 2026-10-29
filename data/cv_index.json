@@ -1,0 +1,72 @@
+{
+  "lastIndexed": "2026-10-29T14:00:00.000Z",
+  "documentTitle": "Profile Linkedincv Thananjayan.pdf",
+  "embeddingModel": "text-embedding-3-small",
+  "totalChunks": 9,
+  "chunks": [
+    {
+      "id": "chunk_0",
+      "title": "Executive Summary & Core Specialization",
+      "category": "Profile",
+      "text": "Thananjayan Aruljothy is an AI Full Stack Developer specializing in building intelligent applications powered by Large Language Models (LLMs), Generative AI, and modern cloud technologies. With experience developing AI-driven platforms, he works with Python Flask, OpenAI API, Claude AI, Google Gemini, ElevenLabs, AI image/video generation, and API integrations to create scalable and user-focused solutions. His expertise includes building interactive web applications using Fabric.js canvas, developing AI content creation workflows, integrating third-party AI services, and deploying applications on AWS EC2 environments. Core Skills: Python, Flask, Generative AI, LLM Integration, OpenAI API, Claude AI, Google Gemini, Fabric.js, AWS EC2, REST APIs, Salesforce.",
+      "embedding": []
+    },
+    {
+      "id": "chunk_1",
+      "title": "Experience: Flipick - AI Full Stack Engineer (2023 - Present)",
+      "category": "Experience",
+      "text": "Flipick (April 2023 - Present, 3+ years), AI Full Stack Engineer, Jaffna, Sri Lanka. Develops AI-powered applications and intelligent content creation platforms using Python, Flask, Large Language Models (LLMs), and modern AI APIs. Designs and implements AI workflows integrating OpenAI, Claude AI, Google Gemini, ElevenLabs Text-to-Speech (TTS), and AI image/video generation services. Builds scalable backend services using Python Flask, handling AI integrations, data processing, and application logic. Develops interactive web-based editors and creative tools using Fabric.js canvas technology for AI-generated content editing and customization.",
+      "embedding": []
+    },
+    {
+      "id": "chunk_2",
+      "title": "Experience: Flipick - Pipelines & Cloud Deployment",
+      "category": "Experience",
+      "text": "At Flipick, Thananjayan builds automated AI video generation pipelines integrating LLM-based script generation, image generation, voice synthesis, avatars, and media processing workflows. He deploys and manages applications on AWS EC2 environments (both Linux/Ubuntu and Windows), including server configuration, application deployment, and performance optimization. Collaborates with product and engineering teams to design, develop, and deliver AI-driven features for eLearning and content creation platforms with maintainable, reliable code.",
+      "embedding": []
+    },
+    {
+      "id": "chunk_3",
+      "title": "Experience: Eureka Innovations - Associate Software Engineer (2022)",
+      "category": "Experience",
+      "text": "Eureka Innovations (April 2022 - November 2022, 8 months), Associate Software Engineer, Colombo, Sri Lanka. Handled UI/UX Design with HTML, CSS, JavaScript. Configured Firebase cloud database and authentication services. Utilized Three.js for interactive 3D rendering in the browser. Directly involved in UI design and frontend development for AI-integrated Edtech Products: Brainiverse and Xtramark.",
+      "embedding": []
+    },
+    {
+      "id": "chunk_4",
+      "title": "Experience: KoceanSoft - Junior Web Developer (2022)",
+      "category": "Experience",
+      "text": "KoceanSoft (January 2022 - April 2022), Junior Web Developer - CMS, Jaffna, Sri Lanka. Developed responsive user-friendly websites and worked extensively on content management systems, search engine optimization (SEO), Adobe XD prototyping, and modern landing page designs.",
+      "embedding": []
+    },
+    {
+      "id": "chunk_5",
+      "title": "Education: University of Colombo (BIT)",
+      "category": "Education",
+      "text": "University of Colombo School of Computing (UCSC) (January 2020 - October 2023). Bachelor of Science in Information Technology (BIT), Computer/Information Technology Administration and Management. Focus on software engineering, database management, algorithms, web development, and cloud computing.",
+      "embedding": []
+    },
+    {
+      "id": "chunk_6",
+      "title": "Education: University of Moratuwa & High School",
+      "category": "Education",
+      "text": "University of Moratuwa (November 2011 - April 2016). B.Sc (Hons) in Transport & Logistics Management. Focus on optimization, analytics, and operational systems. High School: Jaffna Hindu College (2002 - 2010), Advanced Level in Combined Mathematics.",
+      "embedding": []
+    },
+    {
+      "id": "chunk_7",
+      "title": "Certifications & Credentials",
+      "category": "Certifications",
+      "text": "Verified Credentials: 1. Salesforce Superbadge: Multi-Factor Authentication (MFA) and Single Sign-On (SSO) Settings Superbadge Unit. 2. Salesforce Specialist: Lightning Experience Reports & Dashboards Specialist. 3. EducateHacks 2023: AI and EdTech Innovation Winner. 4. Salesforce App Customization Specialist. 5. SEO Simplified & Web Optimization certification.",
+      "embedding": []
+    },
+    {
+      "id": "chunk_8",
+      "title": "Contact Information & Availability",
+      "category": "Contact",
+      "text": "Contact Thananjayan Aruljothy: Email: thananjayan1991@yahoo.com | Phone & WhatsApp: +94 77 844 9255 | LinkedIn: https://www.linkedin.com/in/thananjayan-aruljothy/ | GitHub: https://github.com/Thananjayan91 | Location: Sri Lanka. Languages: English (Professional Working), Tamil (Native/Bilingual), Sinhalese (Professional Working). Open for full-time AI Full Stack roles, LLM agent development, and technical consulting.",
+      "embedding": []
+    }
+  ]
+}
+

@@ -1,163 +1,196 @@
 /**
  * Vercel Serverless Function: /api/chat
- * RAG (Retrieval-Augmented Generation) Endpoint for Thananjayan's AI Portfolio
+ * Complete RAG (Retrieval-Augmented Generation) Pipeline for Thananjayan's Portfolio
  * 
- * Supports:
- * 1. Semantic retrieval from CV knowledge chunks
- * 2. Optional OpenAI / Google Gemini API integration via process.env.OPENAI_API_KEY / process.env.GEMINI_API_KEY
- * 3. Graceful fallback to verified structured CV responses
+ * Pipeline:
+ * 1. User Query -> OpenAI text-embedding-3-small (Vector Embedding)
+ * 2. Cosine Similarity Search against active CV vector index
+ * 3. Top-K chunk selection & Context synthesis
+ * 4. OpenAI gpt-4o-mini synthesis with strict context grounding
  */
 
-const RESUME_CHUNKS = [
-  {
-    id: "profile",
-    title: "Executive Profile & Headline",
-    content: "Thananjayan Aruljothy is an AI Full-Stack Engineer specializing in building intelligent web applications powered by Large Language Models (LLMs), Generative AI, and modern cloud technologies. Located in Sri Lanka. Core skills: Python, Flask, Generative AI, LLM Integration, OpenAI API, Claude AI, Google Gemini, ElevenLabs, Fabric.js, AWS EC2, REST APIs, Salesforce.",
-    citation: "CV - Executive Summary"
-  },
-  {
-    id: "flipick",
-    title: "AI Full Stack Engineer at Flipick",
-    content: "At Flipick (April 2023 - Present), Thananjayan develops AI-powered applications and intelligent content creation platforms using Python, Flask, LLMs, and modern AI APIs. Designs AI workflows integrating OpenAI, Claude AI, Google Gemini, and ElevenLabs TTS. Builds scalable backend services using Python Flask handling AI integrations, data processing, and application logic. Develops interactive web editors using Fabric.js canvas technology. Builds AI video pipelines integrating LLM scripts, images, voice synthesis, avatars. Deploys on AWS EC2 (Ubuntu & Windows Server).",
-    citation: "CV - Experience: Flipick"
-  },
-  {
-    id: "eureka",
-    title: "Associate Software Engineer at Eureka Innovations",
-    content: "At Eureka Innovations (April 2022 - November 2022), Thananjayan handled UI/UX Design with HTML, CSS, JavaScript, Firebase configuration, and Three.js for interactive 3D rendering. Involved in UI design of AI-integrated Edtech Products: Brainiverse and Xtramark.",
-    citation: "CV - Experience: Eureka Innovations"
-  },
-  {
-    id: "koceansoft",
-    title: "Junior Web Developer at KoceanSoft",
-    content: "At KoceanSoft (January 2022 - April 2022), worked as Junior Web Developer focusing on responsive CMS, SEO optimization, and web application architecture.",
-    citation: "CV - Experience: KoceanSoft"
-  },
-  {
-    id: "education",
-    title: "Educational Background",
-    content: "Thananjayan completed his Bachelor of Information Technology (BIT) at University of Colombo School of Computing (UCSC) (2020 - 2023). He also holds a B.Sc (Hons) in Transport & Logistics Management from the University of Moratuwa (2011 - 2016).",
-    citation: "CV - Education"
-  },
-  {
-    id: "certifications",
-    title: "Certifications & Credentials",
-    content: "Certified in Salesforce Multi-Factor Authentication and Single Sign-On Settings Superbadge Unit, Lightning Experience Reports & Dashboards Specialist, EducateHacks 2023 Winner for AI/Edtech innovation, App Customization Specialist, and SEO Simplified.",
-    citation: "CV - Certifications & Honors"
-  },
-  {
-    id: "contact",
-    title: "Contact & Collaboration",
-    content: "Email: thananjayan1991@yahoo.com | Phone: +94 77 844 9255 | LinkedIn: linkedin.com/in/thananjayan-aruljothy | GitHub: github.com/Thananjayan91. Open for AI full-stack engineering roles, LLM application architecture, and consulting.",
-    citation: "CV - Contact"
+import fs from 'fs';
+import path from 'path';
+
+// Cosine similarity between two vectors
+function cosineSimilarity(vecA, vecB) {
+  if (!vecA || !vecB || vecA.length !== vecB.length) return 0;
+  let dotProduct = 0;
+  let normA = 0;
+  let normB = 0;
+  for (let i = 0; i < vecA.length; i++) {
+    dotProduct += vecA[i] * vecB[i];
+    normA += vecA[i] * vecA[i];
+    normB += vecB[i] * vecB[i];
   }
-];
+  if (normA === 0 || normB === 0) return 0;
+  return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
+}
+
+// Fallback keyword scoring when vectors are not yet populated
+function keywordScore(text, query) {
+  const words = query.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+  const textLower = text.toLowerCase();
+  let score = 0;
+  for (const word of words) {
+    if (textLower.includes(word)) {
+      score += 1;
+    }
+  }
+  return score;
+}
 
 export default async function handler(req, res) {
-  // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-API-Key');
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
   if (req.method !== 'POST') {
-    return res.status(200).json({ 
-      status: 'active',
-      message: 'Thananjayan RAG API Endpoint is live.' 
-    });
+    return res.status(200).json({ status: 'active', message: 'Thananjayan RAG API Endpoint is live.' });
   }
 
   try {
-    const { query } = req.body || {};
-    if (!query) {
+    const { query, activeIndex, apiKey: clientApiKey } = req.body || {};
+    const apiKey = clientApiKey || req.headers['x-api-key'] || process.env.OPENAI_API_KEY;
+
+    if (!query || typeof query !== 'string') {
       return res.status(400).json({ error: 'Query parameter is required' });
     }
 
-    const cleanQuery = query.toLowerCase();
-
-    // 1. Semantic Chunk Score Matcher (Lightweight Retrieval Step)
-    let bestChunk = RESUME_CHUNKS[0];
-    let maxScore = 0;
-
-    const queryWords = cleanQuery.split(/\s+/).filter(w => w.length > 2);
-
-    for (const chunk of RESUME_CHUNKS) {
-      let score = 0;
-      const contentLower = chunk.content.toLowerCase();
-      const titleLower = chunk.title.toLowerCase();
-
-      for (const word of queryWords) {
-        if (titleLower.includes(word)) score += 3;
-        if (contentLower.includes(word)) score += 1;
-      }
-
-      if (score > maxScore) {
-        maxScore = score;
-        bestChunk = chunk;
+    // 1. Resolve Active Index (client-provided or bundled data/cv_index.json)
+    let indexData = null;
+    if (activeIndex && Array.isArray(activeIndex.chunks) && activeIndex.chunks.length > 0) {
+      indexData = activeIndex;
+    } else {
+      try {
+        const filePath = path.join(process.cwd(), 'data', 'cv_index.json');
+        if (fs.existsSync(filePath)) {
+          const raw = fs.readFileSync(filePath, 'utf-8');
+          indexData = JSON.parse(raw);
+        }
+      } catch (err) {
+        console.warn('Could not read data/cv_index.json:', err.message);
       }
     }
 
-    // 2. Optional: If user sets OPENAI_API_KEY in Vercel Environment Variables
-    if (process.env.OPENAI_API_KEY) {
+    const chunks = indexData?.chunks || [];
+    if (chunks.length === 0) {
+      return res.status(500).json({ error: 'No CV chunks available for RAG search.' });
+    }
+
+    // 2. Perform Retrieval
+    let scoredChunks = [];
+
+    // If an OpenAI API Key is present, generate vector embedding for the user query
+    if (apiKey) {
       try {
-        const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
+        const embedRes = await fetch('https://api.openai.com/v1/embeddings', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+            'Authorization': `Bearer ${apiKey}`
+          },
+          body: JSON.stringify({
+            model: 'text-embedding-3-small',
+            input: query
+          })
+        });
+
+        if (embedRes.ok) {
+          const embedData = await embedRes.json();
+          const queryVector = embedData.data?.[0]?.embedding;
+
+          if (queryVector) {
+            scoredChunks = chunks.map(chunk => {
+              const sim = (chunk.embedding && chunk.embedding.length > 0)
+                ? cosineSimilarity(queryVector, chunk.embedding)
+                : keywordScore(`${chunk.title} ${chunk.text}`, query) * 0.15;
+              return { ...chunk, score: sim };
+            });
+          }
+        }
+      } catch (embedErr) {
+        console.warn('Vector embedding failed, falling back to keyword similarity:', embedErr.message);
+      }
+    }
+
+    // Fallback scoring if vector search was not performed
+    if (scoredChunks.length === 0) {
+      scoredChunks = chunks.map(chunk => ({
+        ...chunk,
+        score: keywordScore(`${chunk.title} ${chunk.text}`, query)
+      }));
+    }
+
+    // Sort descending by score
+    scoredChunks.sort((a, b) => b.score - a.score);
+
+    // Pick Top-K most relevant chunks (top 3)
+    const topChunks = scoredChunks.slice(0, 3);
+    const contextText = topChunks.map((c, i) => `[Source ${i + 1}: ${c.title}]\n${c.text}`).join('\n\n');
+
+    // 3. Generate Grounded Answer with LLM (gpt-4o-mini) if API key available
+    if (apiKey) {
+      try {
+        const completionRes = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
           },
           body: JSON.stringify({
             model: 'gpt-4o-mini',
             messages: [
               {
                 role: 'system',
-                content: `You are the AI assistant for Thananjayan Aruljothy's portfolio. Answer the visitor's question professionally, concisely, and accurately based strictly on this verified context:\n\n${bestChunk.content}`
+                content: `You are the official AI representative for Thananjayan Aruljothy's portfolio website.\n` +
+                         `Answer the visitor's question in a professional, engaging, and accurate manner based strictly on the retrieved CV context below.\n` +
+                         `Use concise formatting and bullet points where helpful. Do NOT include any "Source:" citations or chunk IDs in the text.\n` +
+                         `If including a note to reach out to Thananjayan directly (thananjayan1991@yahoo.com or +94 77 844 9255), ALWAYS place a clear horizontal rule "---" and line break before that contact sentence so it is neatly separated.\n\n` +
+                         `=== RETRIEVED CV CONTEXT ===\n${contextText}`
               },
               { role: 'user', content: query }
             ],
-            temperature: 0.3
+            temperature: 0.25,
+            max_tokens: 380
           })
         });
 
-        if (openaiRes.ok) {
-          const aiData = await openaiRes.json();
-          const generatedAnswer = aiData.choices?.[0]?.message?.content;
-          if (generatedAnswer) {
+        if (completionRes.ok) {
+          const compData = await completionRes.json();
+          const aiText = compData.choices?.[0]?.message?.content;
+          if (aiText) {
             return res.status(200).json({
-              answer: generatedAnswer,
-              citation: bestChunk.citation,
-              retrievedChunk: bestChunk.title
+              answer: aiText,
+              citation: topChunks[0]?.title || 'Verified CV Index',
+              sources: topChunks.map(c => ({ title: c.title, category: c.category, score: c.score })),
+              mode: 'openai-rag'
             });
           }
         }
-      } catch (err) {
-        console.error('External LLM error, falling back to local RAG retrieval:', err);
+      } catch (llmErr) {
+        console.warn('OpenAI completion failed, falling back to local synthesis:', llmErr.message);
       }
     }
 
-    // 3. Built-in Deterministic RAG Response
-    let responseText = bestChunk.content;
-
-    if (cleanQuery.includes('strength') || cleanQuery.includes('skill')) {
-      responseText = `Thananjayan's core technical strengths include **Generative AI & LLM Systems** (OpenAI, Claude, Gemini, ElevenLabs), **Backend & Cloud Architecture** (Python Flask REST APIs, AWS EC2 & Lambda), and **Interactive Web Graphics** (Fabric.js canvas & Three.js 3D rendering).`;
-    } else if (cleanQuery.includes('contact') || cleanQuery.includes('hire') || cleanQuery.includes('email')) {
-      responseText = `You can get in touch with Thananjayan via email at **thananjayan1991@yahoo.com**, phone/WhatsApp at **+94 77 844 9255**, or connect on LinkedIn at [linkedin.com/in/thananjayan-aruljothy](https://www.linkedin.com/in/thananjayan-aruljothy/).`;
-    }
-
+    // 4. Deterministic Context-Grounded Fallback (if no key or offline)
+    const primaryChunk = topChunks[0] || chunks[0];
     return res.status(200).json({
-      answer: responseText,
-      citation: bestChunk.citation,
-      retrievedChunk: bestChunk.title
+      answer: primaryChunk.text,
+      citation: primaryChunk.title,
+      sources: topChunks.map(c => ({ title: c.title, category: c.category })),
+      mode: 'local-retrieval'
     });
 
   } catch (error) {
-    return res.status(500).json({ 
-      error: 'Failed to process RAG query', 
-      details: error.message 
+    console.error('RAG Error:', error);
+    return res.status(500).json({
+      error: 'Failed to process RAG request',
+      details: error.message
     });
   }
 }
-

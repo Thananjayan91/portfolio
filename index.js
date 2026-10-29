@@ -1,19 +1,128 @@
 /**
  * Thananjayan.ai - Interactive Engine
- * Neural Background, Interactive Circuit, Projects Switcher & RAG Chatbot
+ * Neural Background, Interactive Circuit, Projects Switcher, RAG Chatbot & Admin CV Indexer
  */
 
-document.addEventListener('DOMContentLoaded', () => {
+let activeCVIndex = null;
+let customApiKey = localStorage.getItem('thananjayan_openai_key') || '';
+
+document.addEventListener('DOMContentLoaded', async () => {
   initNeuralCanvas();
   initSkillsCircuit();
   initProjectsShowcase();
+  await loadInitialVectorIndex();
   initRagChatbot();
   initNavigation();
   initCopyBio();
+  initAdminRAGModal();
 });
 
 /* ===================================================================
-   1. Interactive Background Neural Canvas (Constellation & Particles)
+   Cosine Similarity & Client-Side OpenAI Fallback (For VS Code Live Server)
+   =================================================================== */
+function cosineSimilarity(vecA, vecB) {
+  if (!vecA || !vecB || vecA.length !== vecB.length) return 0;
+  let dotProduct = 0;
+  let normA = 0;
+  let normB = 0;
+  for (let i = 0; i < vecA.length; i++) {
+    dotProduct += vecA[i] * vecB[i];
+    normA += vecA[i] * vecA[i];
+    normB += vecB[i] * vecB[i];
+  }
+  if (normA === 0 || normB === 0) return 0;
+  return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
+}
+
+async function callOpenAIEmbeddingsDirect(texts, apiKey) {
+  const res = await fetch('https://api.openai.com/v1/embeddings', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model: 'text-embedding-3-small',
+      input: texts
+    })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || `OpenAI error ${res.status}: ${res.statusText}`);
+  }
+  return await res.json();
+}
+
+async function callOpenAIChatDirect(query, contextText, apiKey) {
+  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model: 'gpt-4o-mini',
+      messages: [
+        {
+          role: 'system',
+          content: `You are the official AI representative for Thananjayan Aruljothy's portfolio website.\n` +
+                   `Answer the visitor's question in a professional, engaging, and accurate manner based strictly on the retrieved CV context below.\n` +
+                   `Use concise formatting and bullet points where helpful. Do NOT include any "Source:" citations or chunk IDs in the text.\n` +
+                   `If including a note to reach out to Thananjayan directly (thananjayan1991@yahoo.com or +94 77 844 9255), ALWAYS place a clear horizontal rule "---" and line break before that contact sentence so it is neatly separated.\n\n` +
+                   `=== RETRIEVED CV CONTEXT ===\n${contextText}`
+        },
+        { role: 'user', content: query }
+      ],
+      temperature: 0.25,
+      max_tokens: 380
+    })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || `OpenAI error ${res.status}`);
+  }
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content;
+}
+async function loadInitialVectorIndex() {
+  const cached = localStorage.getItem('thananjayan_active_index');
+  if (cached) {
+    try {
+      activeCVIndex = JSON.parse(cached);
+      updateAdminStatusUI();
+      return;
+    } catch (e) {
+      console.warn('Could not parse cached index');
+    }
+  }
+
+  try {
+    const res = await fetch('./data/cv_index.json');
+    if (res.ok) {
+      activeCVIndex = await res.json();
+      updateAdminStatusUI();
+    }
+  } catch (err) {
+    console.warn('Could not load data/cv_index.json:', err);
+  }
+}
+
+function updateAdminStatusUI() {
+  if (!activeCVIndex) return;
+  const docTitleEl = document.getElementById('status-doc-title');
+  const chunksCountEl = document.getElementById('status-chunks-count');
+  const lastIndexedEl = document.getElementById('status-last-indexed');
+
+  if (docTitleEl) docTitleEl.textContent = activeCVIndex.documentTitle || 'Verified CV';
+  if (chunksCountEl) chunksCountEl.textContent = `${activeCVIndex.chunks?.length || 0} Chunks`;
+  if (lastIndexedEl && activeCVIndex.lastIndexed) {
+    const date = new Date(activeCVIndex.lastIndexed);
+    lastIndexedEl.textContent = date.toLocaleDateString();
+  }
+}
+
+/* ===================================================================
+   2. Interactive Background Neural Canvas (Constellation & Particles)
    =================================================================== */
 function initNeuralCanvas() {
   const canvas = document.getElementById('neural-canvas');
@@ -51,7 +160,6 @@ function initNeuralCanvas() {
   function render() {
     ctx.clearRect(0, 0, width, height);
 
-    // Update & draw particles
     for (let i = 0; i < particles.length; i++) {
       const p = particles[i];
       p.x += p.vx;
@@ -62,13 +170,11 @@ function initNeuralCanvas() {
       if (p.y < 0) p.y = height;
       if (p.y > height) p.y = 0;
 
-      // Draw particle
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
       ctx.fillStyle = p.color + '0.7)';
       ctx.fill();
 
-      // Connect near particles
       for (let j = i + 1; j < particles.length; j++) {
         const p2 = particles[j];
         const dx = p.x - p2.x;
@@ -86,7 +192,6 @@ function initNeuralCanvas() {
         }
       }
 
-      // Subtle mouse interaction
       const mdx = p.x - mouse.x;
       const mdy = p.y - mouse.y;
       const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
@@ -107,7 +212,7 @@ function initNeuralCanvas() {
 }
 
 /* ===================================================================
-   2. Interactive Neural Skills Circuit
+   3. Interactive Neural Skills Circuit
    =================================================================== */
 const SKILLS_DATA = {
   python: {
@@ -217,7 +322,7 @@ function initSkillsCircuit() {
 }
 
 /* ===================================================================
-   3. Projects Showcase Switcher
+   4. Projects Showcase Switcher
    =================================================================== */
 const PROJECTS_DATA = [
   {
@@ -263,7 +368,6 @@ function initProjectsShowcase() {
     thumbCards.forEach(card => card.classList.remove('active'));
     thumbCards[index].classList.add('active');
 
-    // Smooth transition
     projImg.style.opacity = '0';
     setTimeout(() => {
       projImg.src = proj.image;
@@ -290,7 +394,7 @@ function initProjectsShowcase() {
         if (chatInput && botSection) {
           botSection.scrollIntoView({ behavior: 'smooth' });
           chatInput.value = proj.botQuery;
-          handleSendMessage(proj.botQuery);
+          if (handleSendMessage) handleSendMessage(proj.botQuery);
         }
       };
     }
@@ -302,186 +406,8 @@ function initProjectsShowcase() {
 }
 
 /* ===================================================================
-   4. RAG Chatbot Knowledge Base & Interactive Engine
+   5. RAG Chatbot Client Interface
    =================================================================== */
-
-// Structured Knowledge Graph built directly from Thananjayan Aruljothy's verified CV
-const RESUME_KNOWLEDGE_BASE = {
-  profile: {
-    fullName: "Thananjayan Aruljothy",
-    headline: "AI Full-Stack Engineer | Python, Flask, OpenAI & LLM Apps | Scalable AI Web Solutions",
-    location: "Sri Lanka",
-    email: "thananjayan1991@yahoo.com",
-    phone: "+94 77 844 9255",
-    linkedin: "https://www.linkedin.com/in/thananjayan-aruljothy/",
-    github: "https://github.com/Thananjayan91",
-    languages: ["English (Professional Working)", "Tamil (Native / Bilingual)", "Sinhalese (Professional Working)"],
-    summary: "AI Full Stack Developer specializing in intelligent applications powered by Large Language Models (LLMs), Generative AI, and modern cloud technologies. Experienced in Python Flask, OpenAI, Claude AI, Google Gemini, ElevenLabs, AI image/video generation, Fabric.js interactive canvas, and AWS EC2 deployments."
-  },
-  experience: [
-    {
-      company: "Flipick",
-      role: "AI Full Stack Engineer",
-      period: "April 2023 - Present (3+ years)",
-      location: "Jaffna, Sri Lanka",
-      highlights: [
-        "Develop AI-powered applications and intelligent content creation platforms using Python, Flask, LLMs, and modern AI APIs.",
-        "Design AI workflows integrating OpenAI, Claude AI, Google Gemini, and ElevenLabs Text-to-Speech (TTS).",
-        "Build scalable backend services using Python Flask handling AI integrations, data processing, and application logic.",
-        "Develop interactive web-based editors and creative tools using Fabric.js canvas technology for AI-generated content editing.",
-        "Build AI video generation pipelines integrating LLM script generation, image generation, voice synthesis, avatars, and media workflows.",
-        "Deploy and manage applications on AWS EC2 environments (Linux/Ubuntu and Windows)."
-      ]
-    },
-    {
-      company: "Eureka Innovations",
-      role: "Associate Software Engineer",
-      period: "April 2022 - November 2022 (8 months)",
-      location: "Colombo, Sri Lanka",
-      highlights: [
-        "UI / UX Design using HTML, CSS, JavaScript.",
-        "Firebase configuration and cloud database integration.",
-        "Three.js for interactive 3D rendering.",
-        "Involved in UI design of AI-integrated Edtech Products: Brainiverse & Xtramark."
-      ]
-    },
-    {
-      company: "KoceanSoft",
-      role: "Junior Web Developer - CMS",
-      period: "January 2022 - April 2022",
-      location: "Jaffna, Sri Lanka",
-      highlights: ["Developed responsive websites, CMS integrations, and modern SEO architecture."]
-    }
-  ],
-  education: [
-    {
-      degree: "Bachelor of Information Technology (BIT)",
-      institution: "University of Colombo School of Computing (UCSC)",
-      period: "2020 - 2023"
-    },
-    {
-      degree: "B.Sc (Hons) in Transport & Logistics Management",
-      institution: "University of Moratuwa",
-      period: "2011 - 2016"
-    }
-  ],
-  certifications: [
-    "Salesforce Multi-Factor Authentication and Single Sign-On Settings Superbadge Unit",
-    "Lightning Experience Reports & Dashboards Specialist",
-    "EducateHacks 2023 Winner / Innovation Award",
-    "App Customization Specialist",
-    "SEO Simplified & Web Optimization"
-  ],
-  skills: [
-    "Generative AI & LLMs (OpenAI GPT-4o, Claude 3.5, Google Gemini, Prompt Engineering, Agentic Workflows)",
-    "Backend & APIs (Python, Flask, FastAPI, REST APIs, WebSockets)",
-    "Frontend & Graphics (JavaScript ES6+, Fabric.js Canvas, Three.js 3D, HTML5/CSS3)",
-    "Cloud & DevOps (AWS EC2, AWS Lambda, Ubuntu/Linux, Windows Server)",
-    "Media AI (ElevenLabs TTS, AI Video Pipelines, Avatar Generation)"
-  ]
-};
-
-// Local RAG Query Retrieval Engine (Matches intent & semantic keywords)
-function queryKnowledgeBase(userPrompt) {
-  const query = userPrompt.toLowerCase().trim();
-
-  // 1. Technical Strengths & Skills
-  if (query.includes('strength') || query.includes('skill') || query.includes('tech stack') || query.includes('technolog')) {
-    return {
-      text: `Thananjayan's core technical strengths span three main pillars:\n\n` +
-            `1. **Generative AI & LLM Systems**: Expert in designing agentic workflows with OpenAI (GPT-4o), Claude 3.5 Sonnet, Google Gemini, and ElevenLabs voice synthesis.\n` +
-            `2. **Backend & Cloud Architecture**: 3+ years engineering high-concurrency Python Flask REST APIs, data pipelines, and production AWS EC2 (Ubuntu/Windows) & Lambda deployments.\n` +
-            `3. **Interactive Visual Engines**: Deep experience with **Fabric.js canvas** for AI graphic editors and **Three.js** for 3D web rendering.`,
-      citation: "LinkedIn CV - Top Skills & Experience"
-    };
-  }
-
-  // 2. Flipick / Current Role & Projects
-  if (query.includes('flipick') || query.includes('current role') || query.includes('present') || query.includes('content studio') || query.includes('fabric')) {
-    return {
-      text: `Thananjayan is currently an **AI Full Stack Engineer at Flipick** (April 2023 – Present). Key achievements include:\n\n` +
-            `• Architecting intelligent content creation platforms powered by Python Flask and frontier LLMs (OpenAI, Claude, Gemini).\n` +
-            `• Engineering interactive web editors using **Fabric.js canvas** for AI-generated assets.\n` +
-            `• Building automated AI video pipelines with ElevenLabs TTS, avatars, and media stitching.\n` +
-            `• Deploying and maintaining server environments on AWS EC2.`,
-      citation: "LinkedIn CV - Experience: Flipick"
-    };
-  }
-
-  // 3. LLMs, AI agents, Video generation
-  if (query.includes('llm') || query.includes('agent') || query.includes('video') || query.includes('openai') || query.includes('gemini') || query.includes('claude')) {
-    return {
-      text: `Thananjayan builds end-to-end AI applications leveraging:\n\n` +
-            `• **LLM Orchestration**: Prompt design, JSON structured outputs, function calling, and multi-turn workflows with OpenAI, Claude, and Gemini.\n` +
-            `• **AI Video Pipeline**: Automated generation combining LLM scriptwriting, neural voice synthesis via ElevenLabs, custom avatars, and video rendering.\n` +
-            `• **RAG & Context Search**: Connecting vector retrieval pipelines to provide factual, citation-backed answers for enterprise users.`,
-      citation: "LinkedIn CV - AI Full-Stack Specialization"
-    };
-  }
-
-  // 4. Flask, AWS, Cloud & DevOps
-  if (query.includes('flask') || query.includes('aws') || query.includes('cloud') || query.includes('ec2') || query.includes('backend') || query.includes('lambda')) {
-    return {
-      text: `Thananjayan uses **Python Flask** as his primary backend framework, building RESTful endpoints that integrate AI APIs, handle asynchronous processing, and interface with relational databases. On the cloud side, he deploys and optimizes applications on **AWS EC2** (both Linux/Ubuntu and Windows Server environments) as well as **AWS Lambda** serverless functions.`,
-      citation: "LinkedIn CV - Experience & Cloud Deployment"
-    };
-  }
-
-  // 5. Eureka Innovations & Three.js / EdTech
-  if (query.includes('eureka') || query.includes('edtech') || query.includes('three') || query.includes('brainiverse') || query.includes('xtramark')) {
-    return {
-      text: `At **Eureka Innovations** (2022), Thananjayan worked as an Associate Software Engineer where he:\n\n` +
-            `• Developed interactive UI/UX for AI-integrated EdTech products **Brainiverse & Xtramark**.\n` +
-            `• Implemented browser-based 3D model rendering using **Three.js**.\n` +
-            `• Integrated Firebase authentication, cloud functions, and real-time database capabilities.`,
-      citation: "LinkedIn CV - Experience: Eureka Innovations"
-    };
-  }
-
-  // 6. Education & Qualifications
-  if (query.includes('education') || query.includes('degree') || query.includes('university') || query.includes('colombo') || query.includes('moratuwa') || query.includes('ucsc') || query.includes('qualification')) {
-    return {
-      text: `Thananjayan holds two degrees:\n\n` +
-            `1. **Bachelor of Information Technology (BIT)** – University of Colombo School of Computing (UCSC) (2020 – 2023).\n` +
-            `2. **B.Sc (Hons) in Transport & Logistics Management** – University of Moratuwa (2011 – 2016).`,
-      citation: "LinkedIn CV - Education Section"
-    };
-  }
-
-  // 7. Certifications
-  if (query.includes('certificat') || query.includes('salesforce') || query.includes('superbadge') || query.includes('award') || query.includes('credential')) {
-    return {
-      text: `Thananjayan's verified credentials include:\n\n` +
-            `• **Salesforce Superbadge**: Multi-Factor Authentication (MFA) & Single Sign-On (SSO) Settings\n` +
-            `• **Salesforce Specialist**: Lightning Experience Reports & Dashboards\n` +
-            `• **EducateHacks 2023**: AI & EdTech Innovation Winner\n` +
-            `• **App Customization Specialist** (Salesforce)\n` +
-            `• **SEO Simplified** & Web Performance Certification`,
-      citation: "LinkedIn CV - Certifications & Honors"
-    };
-  }
-
-  // 8. Contact, Email, Hiring
-  if (query.includes('contact') || query.includes('hire') || query.includes('email') || query.includes('phone') || query.includes('reach') || query.includes('available')) {
-    return {
-      text: `You can reach Thananjayan directly:\n\n` +
-            `• **Email**: [thananjayan1991@yahoo.com](mailto:thananjayan1991@yahoo.com)\n` +
-            `• **Phone / WhatsApp**: [+94 77 844 9255](tel:+94778449255)\n` +
-            `• **LinkedIn**: [linkedin.com/in/thananjayan-aruljothy](https://www.linkedin.com/in/thananjayan-aruljothy/)\n` +
-            `• **GitHub**: [github.com/Thananjayan91](https://github.com/Thananjayan91)\n\n` +
-            `He is currently open to exciting AI engineering roles, technical consultations, and full-stack projects.`,
-      citation: "LinkedIn CV - Contact Details"
-    };
-  }
-
-  // Default intelligent fallback
-  return {
-    text: `Thananjayan Aruljothy is an AI Full-Stack Engineer with 3+ years experience specializing in Python Flask, Large Language Models (OpenAI, Claude, Gemini), interactive Fabric.js canvas tools, and AWS EC2 deployments. ` +
-          `Feel free to ask about his specific projects, his technical stack, education at University of Colombo, or how to get in touch!`,
-    citation: "LinkedIn CV - Overview"
-  };
-}
-
 let handleSendMessage = null;
 
 function initRagChatbot() {
@@ -493,7 +419,27 @@ function initRagChatbot() {
 
   if (!chatStream || !chatInput || !sendBtn) return;
 
-  function appendMessage(sender, text, citation = null) {
+  function formatBotText(raw) {
+    if (!raw) return '';
+    let text = raw;
+
+    // Convert standard markdown horizontal rules
+    text = text.replace(/^---$/gm, '<div class="bot-contact-divider"></div>');
+
+    // Detect reach out / contact phrases and insert a divider before them if not already present
+    const reachOutRegex = /(If you have (any |specific )?questions|please feel free to reach out|feel free to reach out|please feel free to contact|You can reach Thananjayan directly|reach out to Thananjayan directly)/i;
+    if (reachOutRegex.test(text) && !text.includes('bot-contact-divider')) {
+      text = text.replace(reachOutRegex, '<div class="bot-contact-divider"></div>$1');
+    }
+
+    // Format paragraphs, bold, and line breaks
+    return text
+      .replace(/\n\s*\n/g, '</p><p>')
+      .replace(/\n/g, '<br/>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  }
+
+  function appendMessage(sender, text) {
     const msgDiv = document.createElement('div');
     msgDiv.className = `bot-msg ${sender}`;
 
@@ -506,19 +452,11 @@ function initRagChatbot() {
     const bubbleDiv = document.createElement('div');
     bubbleDiv.className = 'msg-bubble';
 
-    // Format newlines & bold
-    let formatted = text
-      .replace(/\n\n/g, '</p><p>')
-      .replace(/\n/g, '<br/>')
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-
-    bubbleDiv.innerHTML = `<p>${formatted}</p>`;
-
-    if (citation) {
-      const citeSpan = document.createElement('div');
-      citeSpan.className = 'citation-badge';
-      citeSpan.innerHTML = `<i class="fa-solid fa-bookmark"></i> Source: ${citation}`;
-      bubbleDiv.appendChild(citeSpan);
+    // If text starts with HTML element (like our typing indicator dots), render directly
+    if (text.startsWith('<div')) {
+      bubbleDiv.innerHTML = text;
+    } else {
+      bubbleDiv.innerHTML = `<p>${formatBotText(text)}</p>`;
     }
 
     msgDiv.appendChild(avatarDiv);
@@ -536,38 +474,117 @@ function initRagChatbot() {
     chatInput.value = '';
     chatInput.disabled = true;
     sendBtn.disabled = true;
+    sendBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
 
-    // Show temporary typing indicator
-    const typingIndicator = appendMessage('assistant', '<i class="fa-solid fa-circle-notch fa-spin"></i> Retrieving context from CV knowledge base...');
+    // Minimal pulsating dots indicator without text
+    const typingIndicator = appendMessage('assistant', '<div class="typing-indicator-dots"><span class="t-dot"></span><span class="t-dot"></span><span class="t-dot"></span></div>');
 
-    // Attempt to query the backend /api/chat (Vercel serverless function) if online,
-    // otherwise seamlessly use the local RAG knowledge engine.
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: query })
+        headers: { 
+          'Content-Type': 'application/json',
+          ...(customApiKey ? { 'x-api-key': customApiKey } : {})
+        },
+        body: JSON.stringify({ 
+          query: query,
+          activeIndex: activeCVIndex,
+          apiKey: customApiKey || undefined
+        })
       });
 
       if (response.ok) {
         const data = await response.json();
         typingIndicator.parentElement.remove();
-        simulateStreamingText(data.answer, data.citation || 'Vercel RAG API');
+        simulateStreamingText(data.answer);
+        return;
+      }
+
+      // If running on local static server (e.g. VS Code Live Server 405) and customApiKey is available
+      if ((response.status === 405 || response.status === 404) && customApiKey && activeCVIndex?.chunks) {
+        console.log('Static server detected (405). Querying OpenAI directly with local vector search...');
+        const queryEmbedData = await callOpenAIEmbeddingsDirect([query], customApiKey);
+        const queryVec = queryEmbedData.data?.[0]?.embedding;
+        
+        let scored = activeCVIndex.chunks.map(chunk => ({
+          ...chunk,
+          score: (chunk.embedding && chunk.embedding.length > 0)
+            ? cosineSimilarity(queryVec, chunk.embedding)
+            : 0
+        }));
+        scored.sort((a, b) => b.score - a.score);
+        const top = scored.slice(0, 3);
+        const ctxText = top.map((c, i) => `[Source ${i+1}: ${c.title}]\n${c.text}`).join('\n\n');
+        
+        const aiResponse = await callOpenAIChatDirect(query, ctxText, customApiKey);
+        typingIndicator.parentElement.remove();
+        simulateStreamingText(aiResponse);
         return;
       }
     } catch (e) {
-      // Local fallback
+      console.warn('Network call to /api/chat failed, attempting client-side OpenAI or local fallback:', e);
+
+      // If client-side OpenAI is possible
+      if (customApiKey && activeCVIndex?.chunks) {
+        try {
+          const queryEmbedData = await callOpenAIEmbeddingsDirect([query], customApiKey);
+          const queryVec = queryEmbedData.data?.[0]?.embedding;
+          let scored = activeCVIndex.chunks.map(chunk => ({
+            ...chunk,
+            score: (chunk.embedding && chunk.embedding.length > 0)
+              ? cosineSimilarity(queryVec, chunk.embedding)
+              : 0
+          }));
+          scored.sort((a, b) => b.score - a.score);
+          const top = scored.slice(0, 3);
+          const ctxText = top.map((c, i) => `[Source ${i+1}: ${c.title}]\n${c.text}`).join('\n\n');
+          const aiResponse = await callOpenAIChatDirect(query, ctxText, customApiKey);
+          typingIndicator.parentElement.remove();
+          simulateStreamingText(aiResponse);
+          return;
+        } catch (apiErr) {
+          console.error('Direct OpenAI call failed:', apiErr);
+        }
+      }
     }
 
-    // Fallback to client-side RAG engine
+    // Local semantic scoring fallback
     setTimeout(() => {
       typingIndicator.parentElement.remove();
-      const result = queryKnowledgeBase(query);
-      simulateStreamingText(result.text, result.citation);
-    }, 450);
+      const localAnswer = queryLocalKnowledge(query);
+      simulateStreamingText(localAnswer.text);
+    }, 350);
   }
 
-  function simulateStreamingText(fullText, citation) {
+  function queryLocalKnowledge(query) {
+    if (activeCVIndex && activeCVIndex.chunks) {
+      const qLower = query.toLowerCase();
+      let bestChunk = activeCVIndex.chunks[0];
+      let bestScore = -1;
+
+      activeCVIndex.chunks.forEach(chunk => {
+        const text = `${chunk.title} ${chunk.text}`.toLowerCase();
+        let score = 0;
+        qLower.split(/\s+/).forEach(word => {
+          if (word.length > 2 && text.includes(word)) score += 1;
+        });
+        if (score > bestScore) {
+          bestScore = score;
+          bestChunk = chunk;
+        }
+      });
+
+      return {
+        text: bestChunk.text
+      };
+    }
+
+    return {
+      text: "Thananjayan Aruljothy is an AI Full-Stack Engineer with 3+ years experience specializing in Python Flask, Large Language Models (OpenAI, Claude, Gemini), interactive Fabric.js canvas tools, and AWS EC2 deployments.\n\nIf you have specific questions or need further information, please feel free to reach out to Thananjayan directly at thananjayan1991@yahoo.com or +94 77 844 9255."
+    };
+  }
+
+  function simulateStreamingText(fullText) {
     const msgDiv = document.createElement('div');
     msgDiv.className = 'bot-msg assistant';
 
@@ -588,25 +605,17 @@ function initRagChatbot() {
     const timer = setInterval(() => {
       index += 3;
       const current = fullText.substring(0, index);
-      p.innerHTML = current
-        .replace(/\n\n/g, '</p><p>')
-        .replace(/\n/g, '<br/>')
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      p.innerHTML = formatBotText(current);
       chatStream.scrollTop = chatStream.scrollHeight;
 
       if (index >= fullText.length) {
         clearInterval(timer);
-        if (citation) {
-          const citeSpan = document.createElement('div');
-          citeSpan.className = 'citation-badge';
-          citeSpan.innerHTML = `<i class="fa-solid fa-bookmark"></i> Source: ${citation}`;
-          bubbleDiv.appendChild(citeSpan);
-        }
         chatInput.disabled = false;
         sendBtn.disabled = false;
+        sendBtn.innerHTML = '<i class="fa-solid fa-arrow-up"></i>';
         chatInput.focus();
       }
-    }, 18);
+    }, 15);
   }
 
   handleSendMessage = processUserMessage;
@@ -645,7 +654,387 @@ function initRagChatbot() {
 }
 
 /* ===================================================================
-   5. Navigation & UI Helpers
+   6. Protected Admin RAG Modal & Dynamic CV Indexer
+   =================================================================== */
+function initAdminRAGModal() {
+  const openBtn = document.getElementById('open-admin-btn');
+  const closeBtn = document.getElementById('admin-close-btn');
+  const modal = document.getElementById('admin-modal');
+  const authStep = document.getElementById('admin-auth-step');
+  const dashStep = document.getElementById('admin-dashboard-step');
+  const passInput = document.getElementById('admin-passcode-input');
+  const unlockBtn = document.getElementById('admin-unlock-btn');
+  const authError = document.getElementById('auth-error');
+  const lockAgainBtn = document.getElementById('admin-lock-again-btn');
+
+  // Key & Uploader elements
+  const apiKeyInput = document.getElementById('admin-openai-key');
+  const saveKeyBtn = document.getElementById('save-api-key-btn');
+  const dropzone = document.getElementById('cv-dropzone');
+  const fileInput = document.getElementById('cv-file-input');
+  const browseBtn = document.getElementById('browse-file-btn');
+  const fileBar = document.getElementById('upload-file-bar');
+  const fileNameEl = document.getElementById('selected-file-name');
+  const fileSizeEl = document.getElementById('selected-file-size');
+  const removeFileBtn = document.getElementById('remove-file-btn');
+  const startIndexBtn = document.getElementById('start-indexing-btn');
+  const downloadIndexBtn = document.getElementById('download-index-btn');
+  const progressWrap = document.getElementById('indexing-progress-wrap');
+  const progressBar = document.getElementById('indexing-progress-bar');
+  const progressLabel = document.getElementById('indexing-step-label');
+  const progressPercent = document.getElementById('indexing-step-percent');
+  const previewContainer = document.getElementById('chunks-preview-container');
+  const previewCount = document.getElementById('preview-chunk-count');
+  const previewList = document.getElementById('chunks-preview-list');
+  const toggleChunksBtn = document.getElementById('toggle-chunks-btn');
+
+  if (!openBtn || !modal) return;
+
+  let currentUploadedFile = null;
+  let parsedChunks = [];
+
+  if (customApiKey && apiKeyInput) {
+    apiKeyInput.value = customApiKey;
+  }
+
+  // Open & Close
+  openBtn.addEventListener('click', () => {
+    modal.classList.add('open');
+    if (sessionStorage.getItem('thananjayan_admin_auth') === 'true') {
+      authStep.style.display = 'none';
+      dashStep.style.display = 'block';
+      updateAdminStatusUI();
+    } else {
+      authStep.style.display = 'block';
+      dashStep.style.display = 'none';
+      passInput.focus();
+    }
+  });
+
+  closeBtn.addEventListener('click', () => {
+    modal.classList.remove('open');
+  });
+
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) modal.classList.remove('open');
+  });
+
+  // Passcode unlock (default passcode: admin123)
+  function attemptUnlock() {
+    const val = passInput.value.trim();
+    if (val === 'admin123' || val === 'thananjayan2026') {
+      sessionStorage.setItem('thananjayan_admin_auth', 'true');
+      authError.style.display = 'none';
+      authStep.style.display = 'none';
+      dashStep.style.display = 'block';
+      updateAdminStatusUI();
+    } else {
+      authError.style.display = 'block';
+    }
+  }
+
+  unlockBtn.addEventListener('click', attemptUnlock);
+  passInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') attemptUnlock();
+  });
+
+  lockAgainBtn.addEventListener('click', () => {
+    sessionStorage.removeItem('thananjayan_admin_auth');
+    dashStep.style.display = 'none';
+    authStep.style.display = 'block';
+    passInput.value = '';
+  });
+
+  // Save API key
+  saveKeyBtn.addEventListener('click', () => {
+    const keyVal = apiKeyInput.value.trim();
+    if (keyVal) {
+      customApiKey = keyVal;
+      localStorage.setItem('thananjayan_openai_key', keyVal);
+      showToast('OpenAI API Key saved securely in your browser!');
+    } else {
+      customApiKey = '';
+      localStorage.removeItem('thananjayan_openai_key');
+      showToast('API Key cleared (will fallback to Vercel env variable)');
+    }
+  });
+
+  // Drag and drop setup
+  browseBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    fileInput.click();
+  });
+
+  dropzone.addEventListener('click', () => fileInput.click());
+
+  ['dragenter', 'dragover'].forEach(eventName => {
+    dropzone.addEventListener(eventName, (e) => {
+      e.preventDefault();
+      dropzone.classList.add('dragover');
+    });
+  });
+
+  ['dragleave', 'drop'].forEach(eventName => {
+    dropzone.addEventListener(eventName, (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+    });
+  });
+
+  dropzone.addEventListener('drop', (e) => {
+    const files = e.dataTransfer.files;
+    if (files.length > 0) handleSelectedFile(files[0]);
+  });
+
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files.length > 0) handleSelectedFile(fileInput.files[0]);
+  });
+
+  async function handleSelectedFile(file) {
+    currentUploadedFile = file;
+    dropzone.style.display = 'none';
+    fileBar.style.display = 'flex';
+    fileNameEl.textContent = file.name;
+    fileSizeEl.textContent = `${Math.round(file.size / 1024)} KB`;
+
+    // Process & Chunk Document
+    startIndexBtn.disabled = true;
+    progressWrap.style.display = 'block';
+    progressBar.style.width = '20%';
+    progressLabel.textContent = 'Parsing document text...';
+    progressPercent.textContent = '20%';
+
+    try {
+      let extractedText = '';
+      if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
+        extractedText = await extractTextFromPDF(file);
+      } else {
+        extractedText = await file.text();
+      }
+
+      progressBar.style.width = '60%';
+      progressLabel.textContent = 'Performing semantic chunking...';
+      progressPercent.textContent = '60%';
+
+      parsedChunks = chunkDocumentText(extractedText, file.name);
+
+      progressBar.style.width = '100%';
+      progressLabel.textContent = `Extracted ${parsedChunks.length} semantic chunks!`;
+      progressPercent.textContent = '100%';
+
+      // Render chunk preview
+      renderChunksPreview(parsedChunks);
+      startIndexBtn.disabled = false;
+      showToast(`Document parsed into ${parsedChunks.length} chunks. Ready to index!`);
+
+    } catch (err) {
+      console.error('Error parsing file:', err);
+      progressLabel.textContent = `Error: ${err.message}`;
+      showToast('Failed to parse document. Please try a valid text or PDF file.');
+    }
+  }
+
+  removeFileBtn.addEventListener('click', () => {
+    currentUploadedFile = null;
+    parsedChunks = [];
+    fileInput.value = '';
+    dropzone.style.display = 'block';
+    fileBar.style.display = 'none';
+    progressWrap.style.display = 'none';
+    previewContainer.style.display = 'none';
+    startIndexBtn.disabled = true;
+  });
+
+  // PDF.js Text Extractor
+  async function extractTextFromPDF(file) {
+    if (!window.pdfjsLib) {
+      throw new Error('PDF.js library is not loaded');
+    }
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    let fullText = '';
+
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+      const page = await pdf.getPage(pageNum);
+      const textContent = await page.getTextContent();
+      const pageStrings = textContent.items.map(item => item.str).join(' ');
+      fullText += `\n\n--- Page ${pageNum} ---\n` + pageStrings;
+    }
+
+    return fullText;
+  }
+
+  // Semantic Chunker (Sliding Window with Overlap)
+  function chunkDocumentText(text, filename) {
+    const paragraphs = text
+      .split(/\n\s*\n/)
+      .map(p => p.trim())
+      .filter(p => p.length > 35);
+
+    const chunks = [];
+    let currentChunk = '';
+    let chunkIndex = 0;
+
+    for (const para of paragraphs) {
+      if ((currentChunk + ' ' + para).length > 600 && currentChunk.length > 100) {
+        chunks.push({
+          id: `chunk_${chunkIndex}`,
+          title: `Section ${chunkIndex + 1} (${filename})`,
+          category: 'Resume Knowledge',
+          text: currentChunk.trim(),
+          embedding: []
+        });
+        chunkIndex++;
+        // 120-char overlap
+        currentChunk = currentChunk.slice(-120) + ' ' + para;
+      } else {
+        currentChunk += (currentChunk ? '\n' : '') + para;
+      }
+    }
+
+    if (currentChunk.trim().length > 20) {
+      chunks.push({
+        id: `chunk_${chunkIndex}`,
+        title: `Section ${chunkIndex + 1} (${filename})`,
+        category: 'Resume Knowledge',
+        text: currentChunk.trim(),
+        embedding: []
+      });
+    }
+
+    return chunks;
+  }
+
+  function renderChunksPreview(chunks) {
+    previewContainer.style.display = 'block';
+    previewCount.textContent = chunks.length;
+    previewList.innerHTML = '';
+
+    chunks.forEach((c, idx) => {
+      const item = document.createElement('div');
+      item.className = 'chunk-preview-item';
+      item.innerHTML = `
+        <div class="chunk-preview-title">${idx + 1}. ${c.title}</div>
+        <div>${c.text.substring(0, 160)}...</div>
+      `;
+      previewList.appendChild(item);
+    });
+  }
+
+  if (toggleChunksBtn) {
+    toggleChunksBtn.addEventListener('click', () => {
+      const isHidden = previewList.style.display === 'none';
+      previewList.style.display = isHidden ? 'flex' : 'none';
+      const chevron = document.getElementById('chunks-chevron');
+      if (chevron) {
+        chevron.className = isHidden ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down';
+      }
+    });
+  }
+
+  // Trigger Re-indexing with OpenAI Embeddings
+  startIndexBtn.addEventListener('click', async () => {
+    if (!parsedChunks || parsedChunks.length === 0) return;
+
+    startIndexBtn.disabled = true;
+    progressBar.style.width = '30%';
+    progressLabel.textContent = 'Calling OpenAI Embeddings API (text-embedding-3-small)...';
+    progressPercent.textContent = '30%';
+
+    try {
+      let indexResult = null;
+      let usedServerless = false;
+
+      // 1. Attempt Vercel serverless endpoint first
+      try {
+        const response = await fetch('/api/index-cv', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chunks: parsedChunks,
+            documentTitle: currentUploadedFile ? currentUploadedFile.name : 'Uploaded_CV.pdf',
+            apiKey: customApiKey || undefined
+          })
+        });
+
+        if (response.ok) {
+          const resData = await response.json();
+          indexResult = resData.index;
+          usedServerless = true;
+        } else if (response.status !== 405 && response.status !== 404) {
+          const errJson = await response.json().catch(() => ({}));
+          throw new Error(errJson.error || errJson.details || `Indexing failed (${response.status})`);
+        }
+      } catch (netErr) {
+        console.warn('Serverless endpoint not reachable, trying client-side indexing:', netErr);
+      }
+
+      // 2. Direct browser fallback if running on static local server (e.g. VS Code Live Server 405)
+      if (!usedServerless) {
+        if (!customApiKey) {
+          throw new Error('Static local server detected (Live Server). Please enter and save your OpenAI API Key above to index directly, or run with "vercel dev".');
+        }
+
+        console.log('Static dev server (405) detected. Invoking OpenAI Embeddings directly from browser...');
+        progressLabel.textContent = 'Calling OpenAI Embeddings API directly from browser...';
+        progressBar.style.width = '60%';
+        progressPercent.textContent = '60%';
+
+        const texts = parsedChunks.map(c => `${c.title || ''}: ${c.text}`);
+        const embedData = await callOpenAIEmbeddingsDirect(texts, customApiKey);
+
+        const indexedChunks = parsedChunks.map((chunk, index) => ({
+          ...chunk,
+          embedding: embedData.data[index].embedding
+        }));
+
+        indexResult = {
+          lastIndexed: new Date().toISOString(),
+          documentTitle: currentUploadedFile ? currentUploadedFile.name : 'Uploaded_CV.pdf',
+          embeddingModel: 'text-embedding-3-small',
+          totalChunks: indexedChunks.length,
+          chunks: indexedChunks
+        };
+      }
+
+      activeCVIndex = indexResult;
+      localStorage.setItem('thananjayan_active_index', JSON.stringify(activeCVIndex));
+
+      progressBar.style.width = '100%';
+      progressLabel.textContent = `Completed! ${activeCVIndex.chunks.length} chunks indexed as new.`;
+      progressPercent.textContent = '100%';
+
+      updateAdminStatusUI();
+      showToast('CV Re-indexed successfully! Bot is updated with your new data.');
+
+    } catch (err) {
+      console.error('Re-indexing error:', err);
+      progressLabel.textContent = `Failed: ${err.message}`;
+      showToast(`Error: ${err.message}`);
+    } finally {
+      startIndexBtn.disabled = false;
+    }
+  });
+
+  // Download cv_index.json to commit permanently to repository
+  downloadIndexBtn.addEventListener('click', () => {
+    if (!activeCVIndex) {
+      showToast('No active index to download');
+      return;
+    }
+    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(activeCVIndex, null, 2));
+    const dlAnchor = document.createElement('a');
+    dlAnchor.setAttribute('href', dataStr);
+    dlAnchor.setAttribute('download', 'cv_index.json');
+    document.body.appendChild(dlAnchor);
+    dlAnchor.click();
+    dlAnchor.remove();
+    showToast('Downloaded cv_index.json! Place it into data/ to commit to Vercel.');
+  });
+}
+
+/* ===================================================================
+   7. Navigation & UI Helpers
    =================================================================== */
 function initNavigation() {
   const header = document.querySelector('.site-header');
@@ -653,7 +1042,6 @@ function initNavigation() {
   const navMenu = document.getElementById('nav-menu');
   const navLinks = document.querySelectorAll('.nav-link');
 
-  // Sticky header blur on scroll
   window.addEventListener('scroll', () => {
     if (window.scrollY > 40) {
       header.classList.add('scrolled');
@@ -662,7 +1050,6 @@ function initNavigation() {
     }
   });
 
-  // Mobile menu toggle
   if (mobileToggle && navMenu) {
     mobileToggle.addEventListener('click', () => {
       navMenu.classList.toggle('mobile-open');
@@ -675,7 +1062,6 @@ function initNavigation() {
     });
   }
 
-  // Active section indicator
   const sections = document.querySelectorAll('section[id]');
   window.addEventListener('scroll', () => {
     let current = '';
@@ -706,7 +1092,7 @@ function showToast(message) {
   toast.classList.add('show');
   setTimeout(() => {
     toast.classList.remove('show');
-  }, 2600);
+  }, 3200);
 }
 
 function initCopyBio() {

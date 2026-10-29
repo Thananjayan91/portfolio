@@ -1,94 +1,95 @@
-# Thananjayan.ai — AI Full-Stack Engineer Portfolio & RAG Assistant
+# Thananjayan.ai — AI Full-Stack Engineer Portfolio & Dynamic RAG System
 
-A modern, high-performance portfolio website for **Thananjayan Aruljothy** (AI Full-Stack Engineer), built with a futuristic dark neural aesthetic, interactive circuit board skill tree, interactive project showcase, and a built-in **RAG (Retrieval-Augmented Generation) AI Assistant**.
+A modern, high-performance portfolio website for **Thananjayan Aruljothy** (AI Full-Stack Engineer), built with a futuristic dark neural aesthetic, interactive circuit board skill tree, project showcase, and a **Retrieval-Augmented Generation (RAG)** system with a **dynamic CV uploader & re-indexer**.
 
-Ready for instant one-click deployment to **Vercel**.
+Ready for one-click deployment to **Vercel**.
 
 ---
 
-## ⚡ Key Highlights & Architecture
+## ⚡ What’s Included
 
-- **Futuristic Visual Design**: Inspired by neural AI networks, featuring ambient floating particle constellations, glowing purple splash backdrop for the hero portrait, and glassmorphism styling.
-- **Interactive Skills Circuit**: Stylized neural PCB circuit board with clickable/hoverable nodes (Python, Flask, OpenAI, AWS, Gemini, Fabric.js, Three.js, etc.) dynamically updating a sleek proficiency meter card.
-- **Featured Projects Showcase**: Left thumbnail selector linked by a glowing neon circuit line to an interactive project preview card with technology badges and links.
-- **RAG AI Assistant ("Ask My Bot")**:
-  - Animated 3D robot mascot with expressive glowing eyes and greeting bubble.
-  - Interactive chat interface pre-loaded with Thananjayan's verified CV and project archives.
-  - One-click prompt chips for quick exploration.
-  - Streaming text responses with source citations.
-- **Serverless Backend Endpoint (`/api/chat`)**:
-  - Native Vercel Serverless Function handling retrieval-augmented queries.
-  - Seamlessly ready to plug into external vector databases (Pinecone, Supabase, Chroma) or LLM providers (OpenAI GPT-4o, Google Gemini, Claude) by adding your API key in Vercel environment variables.
-- **One-Click Resume Download**: Direct download button serving `Thananjayan_CV.pdf`.
+1. **Futuristic Neural Aesthetic UI**:
+   - Neural constellation particle canvas background.
+   - Hero section with glowing brackets `{Thananjayan Aruljothy}`, transparent cutout photo with artistic glowing splash backdrop, and floating tech badges.
+   - Interactive macOS terminal with bio summary and copy button.
+   - Neural circuit board with interactive tech nodes (*Python, Flask, OpenAI, AWS, Gemini, Fabric.js, Three.js, RAG*), displaying live proficiency percentages and detail tags.
+   - Featured projects with connected circuit lines.
+   - Verified credentials (*Salesforce Superbadge, Lightning Specialist, EducateHacks Winner*).
+
+2. **RAG AI Assistant ("Ask My Bot")**:
+   - Animated 3D robot mascot with glowing eyes, pulsing antenna, and `"Hello!"` speech bubble.
+   - One-click prompt chips and live conversational query input.
+   - **Vector Cosine Similarity Search**: Matches user queries against 1536-dimensional embeddings generated with `text-embedding-3-small`.
+   - **Context-Grounded LLM Generation**: Uses `gpt-4o-mini` with source citations.
+
+3. **Dynamic CV Uploader & Admin Re-Indexer**:
+   - Discreet **`RAG Admin`** lock button in the footer.
+   - Passcode protected (default: `admin123` or `thananjayan2026`).
+   - Drag-and-drop new CVs (PDF / TXT) directly in your browser.
+   - In-browser PDF text parsing via PDF.js with automated semantic sliding-window chunking.
+   - Calls `/api/index-cv` to re-embed all chunks with OpenAI.
+   - Immediately updates the live chatbot with your new resume data, saves to `localStorage`, and provides a one-click button to download the updated `cv_index.json`.
 
 ---
 
 ## 🚀 Running Locally
 
-You can run the project locally with any static web server:
-
-### Using Python:
 ```bash
+# Using Python
 python -m http.server 3000
-```
-Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-### Using Node.js / npx:
-```bash
+# Or using Node serve
 npx serve .
 ```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+---
+
+## 🔑 Setting Your OpenAI API Key
+
+You can configure your `OPENAI_API_KEY` in two ways:
+
+1. **Via the Website UI (Admin Modal)**:
+   - Click the **`RAG Admin`** button in the footer.
+   - Enter passcode `admin123`.
+   - Paste your `sk-...` OpenAI key and click **Save Key** (persists in your browser).
+2. **Via Vercel Environment Variables (Recommended for Production)**:
+   - In your Vercel Project Dashboard, navigate to **Settings** → **Environment Variables**.
+   - Key: `OPENAI_API_KEY`
+   - Value: `your_openai_api_key_here`
 
 ---
 
 ## 🌐 Deploying to Vercel
 
-### Option 1: Git Push (Recommended)
-1. Commit and push your changes to your GitHub repository:
-   ```bash
-   git add .
-   git commit -m "feat: complete portfolio UI with RAG engine and Vercel setup"
-   git push origin main
-   ```
-2. Log in to [Vercel](https://vercel.com) and click **"Add New Project"**.
-3. Import your `Thananjayan91/portfolio` repository.
-4. Leave the default settings (Framework Preset: **Other**) and click **Deploy**!
-
-### Option 2: Vercel CLI
 ```bash
-npx vercel
+git add .
+git commit -m "feat: complete portfolio with dynamic RAG uploader and Vercel serverless endpoints"
+git push origin main
 ```
 
----
-
-## 🤖 RAG System Integration Details
-
-The project includes both a client-side intelligent knowledge retriever and a serverless backend function at `/api/chat.js`.
-
-### Connecting your custom LLM / Vector DB:
-1. In your Vercel Dashboard, go to **Settings** -> **Environment Variables**.
-2. Add:
-   - `OPENAI_API_KEY`: Your OpenAI API key (or `GEMINI_API_KEY` for Google Gemini).
-3. If using a Vector Database (e.g., Pinecone, Supabase, Qdrant), you can add the embeddings search directly into `/api/chat.js`.
+1. Go to [vercel.com](https://vercel.com) and click **"Add New Project"**.
+2. Select your `Thananjayan91/portfolio` repository.
+3. In **Environment Variables**, add `OPENAI_API_KEY`.
+4. Click **Deploy**!
 
 ---
 
-## 📁 Project Structure
+## 📁 Project Architecture
 
 ```
 portfolio/
-├── index.html               # Main semantic HTML5 markup
-├── style.css                # Futuristic dark theme, animations & responsiveness
-├── index.js                 # Neural canvas, circuit interactivity, chat engine
-├── Thananjayan_hero.png     # Clean portrait cutout
+├── index.html               # Main website markup & admin modal
+├── style.css                # Dark neural theme, animations, admin UI & responsiveness
+├── index.js                 # Background canvas, circuit logic, RAG client & admin controller
+├── Thananjayan_hero.png     # Cutout portrait photo
 ├── Thananjayan_CV.pdf       # Verified PDF Resume
-├── project_aistudio.jpg     # AI Studio preview mockup
-├── project_edtech.jpg       # EdTech preview mockup
-├── project_video.jpg        # Video Pipeline preview mockup
-├── cert_salesforce.jpg      # Salesforce certificate preview
-├── cert_lightning.jpg       # Lightning Specialist preview
-├── cert_educatehacks.jpg    # EducateHacks preview
+├── data/
+│   └── cv_index.json        # Bundled vector knowledge base & chunks
+├── api/
+│   ├── chat.js              # Serverless function: Cosine similarity + GPT-4o-mini
+│   └── index-cv.js          # Serverless function: OpenAI text-embedding-3-small
 ├── vercel.json              # Vercel deployment configuration
-└── api/
-    └── chat.js              # Vercel Serverless Function (RAG API)
+└── .env.example             # Environment variable template
 ```
-

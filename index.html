@@ -17,6 +17,14 @@
   <!-- FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   
+  <!-- PDF.js for In-Browser CV Parsing -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    if (window.pdfjsLib) {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+  </script>
+
   <!-- Main Stylesheet -->
   <link rel="stylesheet" href="./style.css" />
 </head>
@@ -795,8 +803,149 @@
     <!-- Copyright -->
     <div class="copyright-bar">
       <p>&copy; 2026 Thananjayan Aruljothy. All rights reserved. Deployed on Vercel.</p>
+      <button class="admin-lock-btn" id="open-admin-btn" title="Admin: Update & Re-Index CV">
+        <i class="fa-solid fa-gear"></i> RAG Admin
+      </button>
     </div>
   </footer>
+
+  <!-- Admin RAG Management Modal -->
+  <div class="admin-modal-overlay" id="admin-modal">
+    <div class="admin-modal-dialog">
+      
+      <!-- Close Button -->
+      <button class="admin-close-btn" id="admin-close-btn" aria-label="Close modal">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <!-- Step 1: Passcode Verification Screen -->
+      <div class="admin-auth-panel" id="admin-auth-step">
+        <div class="auth-icon-wrap">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <h3 class="auth-title">RAG Admin Authorization</h3>
+        <p class="auth-desc">Enter your administrator passcode to manage your CV vector index and OpenAI configurations.</p>
+        
+        <form id="admin-auth-form" class="auth-form" onsubmit="return false;">
+          <input type="password" id="admin-passcode-input" placeholder="Enter admin passcode (default: admin123)" autocomplete="current-password" required />
+          <button type="submit" id="admin-unlock-btn" class="btn btn-primary w-full">
+            <i class="fa-solid fa-unlock"></i> Unlock Panel
+          </button>
+          <span class="auth-error-msg" id="auth-error">Incorrect passcode. Try again.</span>
+        </form>
+      </div>
+
+      <!-- Step 2: Full RAG Indexer Dashboard -->
+      <div class="admin-dashboard-panel" id="admin-dashboard-step" style="display: none;">
+        
+        <div class="dash-header">
+          <div>
+            <h3 class="dash-title"><i class="fa-solid fa-database"></i> RAG Knowledge Base Manager</h3>
+            <p class="dash-subtitle">Upload your updated CV to re-chunk, generate vector embeddings, and re-index the AI bot.</p>
+          </div>
+          <button class="btn btn-outline btn-sm" id="admin-lock-again-btn">
+            <i class="fa-solid fa-lock"></i> Lock
+          </button>
+        </div>
+
+        <!-- Current Index Status Card -->
+        <div class="index-status-card">
+          <div class="status-metric">
+            <span class="metric-label">Active Document</span>
+            <span class="metric-value" id="status-doc-title">Profile Linkedincv Thananjayan.pdf</span>
+          </div>
+          <div class="status-metric">
+            <span class="metric-label">Vector Chunks</span>
+            <span class="metric-value" id="status-chunks-count">9 Chunks</span>
+          </div>
+          <div class="status-metric">
+            <span class="metric-label">Embedding Model</span>
+            <span class="metric-value text-cyan">text-embedding-3-small</span>
+          </div>
+          <div class="status-metric">
+            <span class="metric-label">Last Indexed</span>
+            <span class="metric-value" id="status-last-indexed">2026-10-29</span>
+          </div>
+        </div>
+
+        <!-- OpenAI API Key Configuration -->
+        <div class="admin-field-group">
+          <label for="admin-openai-key" class="field-label">
+            <span>OpenAI API Key</span>
+            <span class="field-hint">(Used for text-embedding-3-small & gpt-4o-mini generation)</span>
+          </label>
+          <div class="api-key-input-wrap">
+            <input 
+              type="password" 
+              id="admin-openai-key" 
+              placeholder="sk-proj-... (Optional if OPENAI_API_KEY is configured in Vercel)" 
+              autocomplete="off" 
+            />
+            <button class="btn btn-secondary btn-sm" id="save-api-key-btn">Save Key</button>
+          </div>
+        </div>
+
+        <!-- Drag & Drop CV Upload Box -->
+        <div class="cv-dropzone" id="cv-dropzone">
+          <input type="file" id="cv-file-input" accept=".pdf,.txt,.doc,.docx" class="hidden-file-input" />
+          <div class="dropzone-inner">
+            <i class="fa-solid fa-cloud-arrow-up drop-icon"></i>
+            <h4 class="drop-title">Drag & drop your new CV here</h4>
+            <p class="drop-desc">Supports <strong>PDF</strong>, <strong>TXT</strong> documents</p>
+            <button class="btn btn-secondary btn-sm" id="browse-file-btn">
+              <i class="fa-regular fa-folder-open"></i> Browse File
+            </button>
+          </div>
+        </div>
+
+        <!-- File Upload Info & Progress -->
+        <div class="upload-file-bar" id="upload-file-bar" style="display: none;">
+          <div class="file-info-left">
+            <i class="fa-solid fa-file-pdf file-badge-icon"></i>
+            <div>
+              <span class="file-name" id="selected-file-name">Resume_2026.pdf</span>
+              <span class="file-size" id="selected-file-size">142 KB</span>
+            </div>
+          </div>
+          <button class="btn-icon" id="remove-file-btn" title="Remove file">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+        </div>
+
+        <!-- Indexing Progress Bar -->
+        <div class="indexing-progress-wrap" id="indexing-progress-wrap" style="display: none;">
+          <div class="progress-labels">
+            <span id="indexing-step-label">Extracting text & chunking...</span>
+            <span id="indexing-step-percent">40%</span>
+          </div>
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill" id="indexing-progress-bar" style="width: 40%;"></div>
+          </div>
+        </div>
+
+        <!-- Chunk Preview Accordion -->
+        <div class="chunks-preview-container" id="chunks-preview-container" style="display: none;">
+          <div class="chunks-preview-header" id="toggle-chunks-btn">
+            <span><i class="fa-solid fa-list-check"></i> Extracted Chunks (<span id="preview-chunk-count">0</span>)</span>
+            <i class="fa-solid fa-chevron-down" id="chunks-chevron"></i>
+          </div>
+          <div class="chunks-preview-list" id="chunks-preview-list"></div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="dash-footer-actions">
+          <button class="btn btn-primary" id="start-indexing-btn" disabled>
+            <i class="fa-solid fa-bolt"></i> Re-Index CV Now
+          </button>
+          <button class="btn btn-secondary" id="download-index-btn">
+            <i class="fa-solid fa-download"></i> Download `cv_index.json`
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
 
   <!-- Contact & Feedback Toast -->
   <div class="toast-notification" id="toast">
