@@ -1,10 +1,9 @@
 /**
- * Thananjayan.ai - Interactive Engine
- * Neural Background, Interactive Circuit, Projects Switcher, RAG Chatbot & Admin CV Indexer
+ * Thananjayan.ai - Software Engineer & AI Portfolio
+ * Verified Knowledge Base & RAG Assistant Engine
  */
 
 let activeCVIndex = null;
-let customApiKey = localStorage.getItem('thananjayan_openai_key') || '';
 
 document.addEventListener('DOMContentLoaded', async () => {
   initNeuralCanvas();
@@ -14,11 +13,24 @@ document.addEventListener('DOMContentLoaded', async () => {
   initRagChatbot();
   initNavigation();
   initCopyBio();
-  initAdminRAGModal();
 });
 
 /* ===================================================================
-   Cosine Similarity & Client-Side OpenAI Fallback (For VS Code Live Server)
+   1. Permanent Vector Index Loader (from data/cv_index.json)
+   =================================================================== */
+async function loadInitialVectorIndex() {
+  try {
+    const res = await fetch('./data/cv_index.json?v=' + Date.now());
+    if (res.ok) {
+      activeCVIndex = await res.json();
+    }
+  } catch (err) {
+    console.warn('Could not load data/cv_index.json:', err);
+  }
+}
+
+/* ===================================================================
+   Cosine Similarity Calculator
    =================================================================== */
 function cosineSimilarity(vecA, vecB) {
   if (!vecA || !vecB || vecA.length !== vecB.length) return 0;
@@ -32,95 +44,6 @@ function cosineSimilarity(vecA, vecB) {
   }
   if (normA === 0 || normB === 0) return 0;
   return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
-}
-
-async function callOpenAIEmbeddingsDirect(texts, apiKey) {
-  const res = await fetch('https://api.openai.com/v1/embeddings', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`
-    },
-    body: JSON.stringify({
-      model: 'text-embedding-3-small',
-      input: texts
-    })
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error?.message || `OpenAI error ${res.status}: ${res.statusText}`);
-  }
-  return await res.json();
-}
-
-async function callOpenAIChatDirect(query, contextText, apiKey) {
-  const res = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`
-    },
-    body: JSON.stringify({
-      model: 'gpt-4o-mini',
-      messages: [
-        {
-          role: 'system',
-          content: `You are the official AI representative for Thananjayan Aruljothy's portfolio website.\n` +
-                   `Answer the visitor's question in a professional, engaging, and accurate manner based strictly on the retrieved CV context below.\n` +
-                   `Use concise formatting and bullet points where helpful. Do NOT include any "Source:" citations or chunk IDs in the text.\n` +
-                   `If including a note to reach out to Thananjayan directly (thananjayan1991@yahoo.com or +94 77 844 9255), ALWAYS place a clear horizontal rule "---" and line break before that contact sentence so it is neatly separated.\n\n` +
-                   `=== RETRIEVED CV CONTEXT ===\n${contextText}`
-        },
-        { role: 'user', content: query }
-      ],
-      temperature: 0.25,
-      max_tokens: 380
-    })
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error?.message || `OpenAI error ${res.status}`);
-  }
-  const data = await res.json();
-  return data.choices?.[0]?.message?.content;
-}
-async function loadInitialVectorIndex() {
-  // Always prioritize the committed permanent data/cv_index.json
-  try {
-    const res = await fetch('./data/cv_index.json?v=' + Date.now());
-    if (res.ok) {
-      activeCVIndex = await res.json();
-      updateAdminStatusUI();
-      return;
-    }
-  } catch (err) {
-    console.warn('Could not load data/cv_index.json:', err);
-  }
-
-  // Secondary fallback to localStorage if available
-  const cached = localStorage.getItem('thananjayan_active_index');
-  if (cached) {
-    try {
-      activeCVIndex = JSON.parse(cached);
-      updateAdminStatusUI();
-    } catch (e) {
-      console.warn('Could not parse cached index');
-    }
-  }
-}
-
-function updateAdminStatusUI() {
-  if (!activeCVIndex) return;
-  const docTitleEl = document.getElementById('status-doc-title');
-  const chunksCountEl = document.getElementById('status-chunks-count');
-  const lastIndexedEl = document.getElementById('status-last-indexed');
-
-  if (docTitleEl) docTitleEl.textContent = activeCVIndex.documentTitle || 'Verified CV';
-  if (chunksCountEl) chunksCountEl.textContent = `${activeCVIndex.chunks?.length || 0} Chunks`;
-  if (lastIndexedEl && activeCVIndex.lastIndexed) {
-    const date = new Date(activeCVIndex.lastIndexed);
-    lastIndexedEl.textContent = date.toLocaleDateString();
-  }
 }
 
 /* ===================================================================
@@ -214,68 +137,68 @@ function initNeuralCanvas() {
 }
 
 /* ===================================================================
-   3. Interactive Neural Skills Circuit
+   3. Interactive Neural Skills Circuit (Verified Skills)
    =================================================================== */
 const SKILLS_DATA = {
   python: {
     name: 'Python & Flask',
     percent: 95,
-    desc: 'Primary language & framework for building scalable REST APIs, AI agent microservices, data processing pipelines, and web applications.',
-    tags: ['Python 3.x', 'Flask', 'FastAPI', 'AsyncIO', 'Data Processing']
+    desc: 'Primary language and framework for building REST APIs, AI service integrations, JSON/XML processing, and content automation workflows.',
+    tags: ['Python 3.x', 'Flask', 'REST APIs', 'AsyncIO', 'Data Processing']
   },
   openai: {
-    name: 'OpenAI API & LLMs',
-    percent: 95,
-    desc: 'Deep specialization in prompt engineering, function calling, structured JSON output, tool use, embeddings, and autonomous agent workflows.',
-    tags: ['GPT-4o', 'Function Calling', 'Embeddings', 'AI Workflows']
+    name: 'OpenAI & Claude AI',
+    percent: 92,
+    desc: 'Practical integration of OpenAI (GPT models) and Anthropic Claude for document question-answering, prompt workflows, and narration scripting.',
+    tags: ['OpenAI API', 'Anthropic Claude', 'Prompt Engineering', 'Document Q&A']
   },
   aws: {
-    name: 'AWS Cloud EC2 & Lambda',
+    name: 'AWS EC2 Deployment',
     percent: 90,
-    desc: 'Deploying, managing, and automating high-availability production workloads on AWS EC2 (Ubuntu & Windows Server) and serverless AWS Lambda.',
-    tags: ['AWS EC2', 'AWS Lambda', 'S3', 'Linux / Ubuntu', 'DevOps']
+    desc: 'Deploying and maintaining production applications on AWS EC2 using Gunicorn and Nginx across Linux/Ubuntu and Windows environments.',
+    tags: ['AWS EC2', 'Linux / Ubuntu', 'Windows Server', 'Gunicorn', 'Nginx']
   },
   gemini: {
-    name: 'Google Gemini & Claude AI',
-    percent: 92,
-    desc: 'Multi-modal reasoning pipelines, Anthropic Claude API tool-use integration, large-context document analysis, and generative workflows.',
-    tags: ['Gemini 1.5/2.0', 'Claude 3.5 Sonnet', 'Multi-modal', 'Document Q&A']
+    name: 'Google Gemini & Veo 3',
+    percent: 88,
+    desc: 'Integration of Gemini APIs, Google Veo 3 video clips, character/scene asset generation, and AI-assisted multimedia tools.',
+    tags: ['Google Gemini', 'Google Veo 3', 'AI Video Clips', 'Asset Generation']
   },
   fabric: {
     name: 'Fabric.js Canvas Engine',
     percent: 90,
-    desc: 'Developing interactive HTML5 canvas editors, creative design tools, and asset manipulation systems for AI-generated visual content.',
-    tags: ['Fabric.js', 'Canvas API', 'SVG Rendering', 'Interactive Tools']
+    desc: 'Interactive HTML5 canvas workflows for course authoring, slide element editing (text, shapes, images), and JSON structure persistence.',
+    tags: ['Fabric.js', 'Canvas API', 'JSON Slide Layouts', 'Interactive Tools']
   },
   javascript: {
-    name: 'JavaScript & Modern Web',
+    name: 'JavaScript & Front-End',
     percent: 88,
-    desc: 'Modern ES6+, DOM manipulation, responsive UI/UX architecture, component workflows, and real-time client-side experiences.',
-    tags: ['JavaScript ES6+', 'HTML5', 'CSS3', 'REST Integration', 'UI/UX']
+    desc: 'Modern JavaScript (ES6+), DOM manipulation, responsive interface design, and multimedia integration for web applications.',
+    tags: ['JavaScript ES6+', 'HTML5', 'CSS3', 'REST Integration', 'UI Design']
   },
   restapi: {
-    name: 'REST APIs & Microservices',
+    name: 'REST APIs & Integrations',
     percent: 92,
-    desc: 'Designing clean, secure, and performant RESTful endpoints, CORS security, JWT authentication, and high-concurrency request routing.',
-    tags: ['RESTful Design', 'JSON', 'Microservices', 'Authentication', 'Webhooks']
+    desc: 'Designing and integrating RESTful endpoints, third-party AI APIs, ElevenLabs TTS, Google TTS, D-ID avatars, and Mailchimp.',
+    tags: ['RESTful Design', 'JSON', 'Third-Party APIs', 'Webhooks']
   },
-  threejs: {
-    name: 'Three.js 3D Rendering',
-    percent: 80,
-    desc: 'Involved in 3D rendering for EdTech applications (Brainiverse & Xtramark), custom geometries, lighting, and browser animations.',
-    tags: ['Three.js', 'WebGL', '3D Scene Graphs', 'OrbitControls']
+  gunicorn: {
+    name: 'Gunicorn & Nginx',
+    percent: 88,
+    desc: 'Configuring WSGI application servers (Gunicorn) with Nginx reverse proxying, SSL handling, and server process supervision.',
+    tags: ['Gunicorn', 'Nginx Reverse Proxy', 'WSGI', 'Linux Administration']
   },
   rag: {
-    name: 'RAG & Vector Retrieval',
+    name: 'Document Q&A / RAG',
     percent: 90,
-    desc: 'Context-augmented AI generation, semantic chunking, vector similarity search, embeddings stores, and hallucination reduction.',
-    tags: ['RAG Architecture', 'Vector DB', 'Semantic Search', 'Embeddings']
+    desc: 'Document ingestion (PDF/PowerPoint), semantic text chunking, vector embeddings, and context-grounded LLM retrieval.',
+    tags: ['RAG Architecture', 'Vector Search', 'Text Chunking', 'Embeddings']
   },
   salesforce: {
-    name: 'Salesforce Certified Specialist',
+    name: 'Salesforce Trailhead Ranger',
     percent: 85,
-    desc: 'Superbadge certified in Multi-Factor Authentication (MFA), SSO Settings, Lightning Experience Reports & Dashboards, and App Customization.',
-    tags: ['MFA & SSO Superbadge', 'Lightning Reports', 'Dashboards', 'App Customization']
+    desc: 'Self-directed platform practice with 10 completed Superbadges, Salesforce Flow, and business-process automation (Trailhead learning).',
+    tags: ['Trailhead Ranger', '10 Superbadges', 'Salesforce Flow', 'Process Automation']
   }
 };
 
@@ -324,32 +247,40 @@ function initSkillsCircuit() {
 }
 
 /* ===================================================================
-   4. Projects Showcase Switcher
+   4. Projects Showcase Switcher (Verified Project Responsibilities)
    =================================================================== */
 const PROJECTS_DATA = [
   {
-    title: 'AI Content Studio & Fabric Canvas',
-    desc: 'Architected and deployed an enterprise-grade AI content creation platform at Flipick. Enables users to dynamically prompt LLMs (OpenAI, Claude, Gemini) to generate rich multi-modal assets, then seamlessly customize them on an interactive HTML5 Fabric.js canvas with automated export pipelines.',
+    title: 'Interactive Video Editor & Course Authoring',
+    desc: 'Contributed to an interactive course-authoring platform at Flipick using Fabric.js. Built canvas workflows for adding/editing objects, saved slide layouts as JSON, integrated Google TTS and ElevenLabs for narration generation, and synchronized D-ID avatar video playback with canvas animations and LMS-compatible exports.',
     image: './project_aistudio.jpg',
-    stack: ['Python', 'Flask', 'OpenAI API', 'Claude AI', 'Fabric.js', 'AWS EC2'],
+    stack: ['Python Flask', 'Fabric.js Canvas', 'JavaScript', 'Google TTS', 'ElevenLabs', 'D-ID Avatars'],
     github: 'https://github.com/Thananjayan91',
-    botQuery: 'Tell me about the AI Content Studio project built with Fabric.js'
+    botQuery: 'Tell me about Thananjayan\'s interactive course authoring tool with Fabric.js'
   },
   {
-    title: 'Brainiverse & Xtramark (EdTech Platforms)',
-    desc: 'Engineered responsive UI/UX and interactive 3D rendering modules using Three.js and Firebase at Eureka Innovations. Implemented engaging visual environments for AI-assisted educational technology products that boost student comprehension through 3D spatial models.',
-    image: './project_edtech.jpg',
-    stack: ['Three.js', 'WebGL', 'JavaScript', 'Firebase', 'HTML5/CSS3', 'Jira'],
-    github: 'https://github.com/Thananjayan91',
-    botQuery: 'What was Thananjayan\'s contribution to Brainiverse & Xtramark?'
-  },
-  {
-    title: 'AI Video Generation & Media Automation Pipeline',
-    desc: 'Constructed an end-to-end automated multimedia pipeline integrating LLM script generation, ElevenLabs neural voice synthesis, AI avatars, and media stitching workflows. Deployed on AWS EC2 with automated batch task management.',
+    title: 'AI-Assisted PowerPoint Narration & Automation',
+    desc: 'Engineered an automated multimedia pipeline that extracts text from uploaded PowerPoint slides, prompts OpenAI to draft structured narration scripts, synthesizes MP3 voiceovers, coordinates animation duration with audio length, and preserves human review checkpoints throughout the workflow.',
     image: './project_video.jpg',
-    stack: ['Python', 'ElevenLabs API', 'AWS EC2', 'FFmpeg', 'AI Avatars', 'REST APIs'],
+    stack: ['Python Flask', 'OpenAI API', 'PowerPoint PPTX', 'Audio Synthesis', 'Workflow Approval'],
     github: 'https://github.com/Thananjayan91',
-    botQuery: 'How does Thananjayan\'s AI video generation pipeline work?'
+    botQuery: 'How does the PowerPoint narration automation pipeline work?'
+  },
+  {
+    title: 'AI Video Generation Platform',
+    desc: 'Contributed to an AI video project workflow transforming user briefs into scenes and assets (characters, locations). Integrated Google Gemini and Google Veo 3 short generated clips with an in-app video editor. Developed through AI-assisted coding using Claude Code with responsibility for workflow logic and integrations.',
+    image: './project_edtech.jpg',
+    stack: ['Google Gemini', 'Google Veo 3', 'Anthropic Claude', 'Node.js', 'Claude Code'],
+    github: 'https://github.com/Thananjayan91',
+    botQuery: 'What was Thananjayan\'s role in the AI Video Generation Platform?'
+  },
+  {
+    title: 'Document Question-Answering & RAG System',
+    desc: 'Architected document ingestion workflows accepting PDFs and presentations, parsing and chunking text content, computing vector embeddings, and running semantic vector search to provide citation-grounded answers through an LLM chatbot interface.',
+    image: './project_aistudio.jpg',
+    stack: ['Python', 'Flask', 'OpenAI Embeddings', 'Vector Search', 'RAG Pipeline'],
+    github: 'https://github.com/Thananjayan91',
+    botQuery: 'How is the Document Question-Answering RAG system implemented?'
   }
 ];
 
@@ -368,7 +299,7 @@ function initProjectsShowcase() {
     if (!proj) return;
 
     thumbCards.forEach(card => card.classList.remove('active'));
-    thumbCards[index].classList.add('active');
+    if (thumbCards[index]) thumbCards[index].classList.add('active');
 
     projImg.style.opacity = '0';
     setTimeout(() => {
@@ -425,16 +356,13 @@ function initRagChatbot() {
     if (!raw) return '';
     let text = raw;
 
-    // Convert standard markdown horizontal rules
     text = text.replace(/^---$/gm, '<div class="bot-contact-divider"></div>');
 
-    // Detect reach out / contact phrases and insert a divider before them if not already present
     const reachOutRegex = /(If you have (any |specific )?questions|please feel free to reach out|feel free to reach out|please feel free to contact|You can reach Thananjayan directly|reach out to Thananjayan directly)/i;
     if (reachOutRegex.test(text) && !text.includes('bot-contact-divider')) {
       text = text.replace(reachOutRegex, '<div class="bot-contact-divider"></div>$1');
     }
 
-    // Format paragraphs, bold, and line breaks
     return text
       .replace(/\n\s*\n/g, '</p><p>')
       .replace(/\n/g, '<br/>')
@@ -454,7 +382,6 @@ function initRagChatbot() {
     const bubbleDiv = document.createElement('div');
     bubbleDiv.className = 'msg-bubble';
 
-    // If text starts with HTML element (like our typing indicator dots), render directly
     if (text.startsWith('<div')) {
       bubbleDiv.innerHTML = text;
     } else {
@@ -484,21 +411,13 @@ function initRagChatbot() {
     sendBtn.disabled = true;
     sendBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
 
-    // Minimal pulsating dots indicator without text
     const typingIndicator = appendMessage('assistant', '<div class="typing-indicator-dots"><span class="t-dot"></span><span class="t-dot"></span><span class="t-dot"></span></div>');
 
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          ...(customApiKey ? { 'x-api-key': customApiKey } : {})
-        },
-        body: JSON.stringify({ 
-          query: query,
-          activeIndex: activeCVIndex,
-          apiKey: customApiKey || undefined
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: query })
       });
 
       if (response.ok) {
@@ -507,71 +426,26 @@ function initRagChatbot() {
         simulateStreamingText(data.answer);
         return;
       }
-
-      // If running on local static server (e.g. VS Code Live Server 405) and customApiKey is available
-      if ((response.status === 405 || response.status === 404) && customApiKey && activeCVIndex?.chunks) {
-        console.log('Static server detected (405). Querying OpenAI directly with local vector search...');
-        const queryEmbedData = await callOpenAIEmbeddingsDirect([query], customApiKey);
-        const queryVec = queryEmbedData.data?.[0]?.embedding;
-        
-        let scored = activeCVIndex.chunks.map(chunk => ({
-          ...chunk,
-          score: (chunk.embedding && chunk.embedding.length > 0)
-            ? cosineSimilarity(queryVec, chunk.embedding)
-            : 0
-        }));
-        scored.sort((a, b) => b.score - a.score);
-        const top = scored.slice(0, 3);
-        const ctxText = top.map((c, i) => `[Source ${i+1}: ${c.title}]\n${c.text}`).join('\n\n');
-        
-        const aiResponse = await callOpenAIChatDirect(query, ctxText, customApiKey);
-        typingIndicator.parentElement.remove();
-        simulateStreamingText(aiResponse);
-        return;
-      }
     } catch (e) {
-      console.warn('Network call to /api/chat failed, attempting client-side OpenAI or local fallback:', e);
-
-      // If client-side OpenAI is possible
-      if (customApiKey && activeCVIndex?.chunks) {
-        try {
-          const queryEmbedData = await callOpenAIEmbeddingsDirect([query], customApiKey);
-          const queryVec = queryEmbedData.data?.[0]?.embedding;
-          let scored = activeCVIndex.chunks.map(chunk => ({
-            ...chunk,
-            score: (chunk.embedding && chunk.embedding.length > 0)
-              ? cosineSimilarity(queryVec, chunk.embedding)
-              : 0
-          }));
-          scored.sort((a, b) => b.score - a.score);
-          const top = scored.slice(0, 3);
-          const ctxText = top.map((c, i) => `[Source ${i+1}: ${c.title}]\n${c.text}`).join('\n\n');
-          const aiResponse = await callOpenAIChatDirect(query, ctxText, customApiKey);
-          typingIndicator.parentElement.remove();
-          simulateStreamingText(aiResponse);
-          return;
-        } catch (apiErr) {
-          console.error('Direct OpenAI call failed:', apiErr);
-        }
-      }
+      console.warn('Backend call to /api/chat unavailable, using local semantic fallback:', e);
     }
 
-    // Local semantic scoring fallback
+    // Local semantic scoring fallback from loaded cv_index.json
     setTimeout(() => {
       typingIndicator.parentElement.remove();
       const localAnswer = queryLocalKnowledge(query);
-      simulateStreamingText(localAnswer.text);
+      simulateStreamingText(localAnswer);
     }, 350);
   }
 
   function queryLocalKnowledge(query) {
-    if (activeCVIndex && activeCVIndex.chunks) {
+    if (activeCVIndex && activeCVIndex.chunks && activeCVIndex.chunks.length > 0) {
       const qLower = query.toLowerCase();
       let bestChunk = activeCVIndex.chunks[0];
       let bestScore = -1;
 
       activeCVIndex.chunks.forEach(chunk => {
-        const text = `${chunk.title} ${chunk.text}`.toLowerCase();
+        const text = `${chunk.title || ''} ${chunk.text}`.toLowerCase();
         let score = 0;
         qLower.split(/\s+/).forEach(word => {
           if (word.length > 2 && text.includes(word)) score += 1;
@@ -582,14 +456,10 @@ function initRagChatbot() {
         }
       });
 
-      return {
-        text: bestChunk.text
-      };
+      return bestChunk.text;
     }
 
-    return {
-      text: "Thananjayan Aruljothy is an AI Full-Stack Engineer with 3+ years experience specializing in Python Flask, Large Language Models (OpenAI, Claude, Gemini), interactive Fabric.js canvas tools, and AWS EC2 deployments.\n\nIf you have specific questions or need further information, please feel free to reach out to Thananjayan directly at thananjayan1991@yahoo.com or +94 77 844 9255."
-    };
+    return "Thananjayan Aruljothy is an AI-focused software engineer with over 3 years of experience at Flipick (April 2023 – August 2026), specializing in Python/Flask applications, REST APIs, and AI integrations (OpenAI, Claude, Gemini). Deploys on AWS EC2 with Gunicorn and Nginx.\n\nIf you have specific questions, feel free to reach out directly at thananjayan1991@yahoo.com or +94 77 844 9255.";
   }
 
   function simulateStreamingText(fullText) {
@@ -653,11 +523,10 @@ function initRagChatbot() {
             <i class="fa-solid fa-robot"></i>
           </div>
           <div class="msg-bubble">
-            <p>Chat cleared. Ask me anything about Thananjayan's experience, technical skills, or projects!</p>
+            <p>Chat cleared. Ask me anything about Thananjayan's verified experience, technical skills, or projects!</p>
           </div>
         </div>
       `;
-      // Restore suggested prompt chips when chat is cleared
       const promptChipsContainer = document.querySelector('.bot-prompt-chips');
       if (promptChipsContainer) {
         promptChipsContainer.style.display = 'grid';
@@ -667,399 +536,7 @@ function initRagChatbot() {
 }
 
 /* ===================================================================
-   6. Protected Admin RAG Modal & Dynamic CV Indexer
-   =================================================================== */
-function initAdminRAGModal() {
-  const openBtn = document.getElementById('open-admin-btn');
-  const closeBtn = document.getElementById('admin-close-btn');
-  const modal = document.getElementById('admin-modal');
-  const authStep = document.getElementById('admin-auth-step');
-  const dashStep = document.getElementById('admin-dashboard-step');
-  const passInput = document.getElementById('admin-passcode-input');
-  const unlockBtn = document.getElementById('admin-unlock-btn');
-  const authError = document.getElementById('auth-error');
-  const lockAgainBtn = document.getElementById('admin-lock-again-btn');
-
-  // Key & Uploader elements
-  const apiKeyInput = document.getElementById('admin-openai-key');
-  const saveKeyBtn = document.getElementById('save-api-key-btn');
-  const dropzone = document.getElementById('cv-dropzone');
-  const fileInput = document.getElementById('cv-file-input');
-  const browseBtn = document.getElementById('browse-file-btn');
-  const fileBar = document.getElementById('upload-file-bar');
-  const fileNameEl = document.getElementById('selected-file-name');
-  const fileSizeEl = document.getElementById('selected-file-size');
-  const removeFileBtn = document.getElementById('remove-file-btn');
-  const startIndexBtn = document.getElementById('start-indexing-btn');
-  const downloadIndexBtn = document.getElementById('download-index-btn');
-  const progressWrap = document.getElementById('indexing-progress-wrap');
-  const progressBar = document.getElementById('indexing-progress-bar');
-  const progressLabel = document.getElementById('indexing-step-label');
-  const progressPercent = document.getElementById('indexing-step-percent');
-  const previewContainer = document.getElementById('chunks-preview-container');
-  const previewCount = document.getElementById('preview-chunk-count');
-  const previewList = document.getElementById('chunks-preview-list');
-  const toggleChunksBtn = document.getElementById('toggle-chunks-btn');
-
-  if (!openBtn || !modal) return;
-
-  let currentUploadedFile = null;
-  let parsedChunks = [];
-
-  if (customApiKey && apiKeyInput) {
-    apiKeyInput.value = customApiKey;
-  }
-
-  // Open & Close
-  openBtn.addEventListener('click', () => {
-    modal.classList.add('open');
-    if (sessionStorage.getItem('thananjayan_admin_auth') === 'true') {
-      authStep.style.display = 'none';
-      dashStep.style.display = 'block';
-      updateAdminStatusUI();
-    } else {
-      authStep.style.display = 'block';
-      dashStep.style.display = 'none';
-      passInput.focus();
-    }
-  });
-
-  closeBtn.addEventListener('click', () => {
-    modal.classList.remove('open');
-  });
-
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) modal.classList.remove('open');
-  });
-
-  // Passcode unlock (default passcode: admin123)
-  function attemptUnlock() {
-    const val = passInput.value.trim();
-    if (val === 'admin123' || val === 'thananjayan2026') {
-      sessionStorage.setItem('thananjayan_admin_auth', 'true');
-      authError.style.display = 'none';
-      authStep.style.display = 'none';
-      dashStep.style.display = 'block';
-      updateAdminStatusUI();
-    } else {
-      authError.style.display = 'block';
-    }
-  }
-
-  unlockBtn.addEventListener('click', attemptUnlock);
-  passInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') attemptUnlock();
-  });
-
-  lockAgainBtn.addEventListener('click', () => {
-    sessionStorage.removeItem('thananjayan_admin_auth');
-    dashStep.style.display = 'none';
-    authStep.style.display = 'block';
-    passInput.value = '';
-  });
-
-  // Save API key
-  saveKeyBtn.addEventListener('click', () => {
-    const keyVal = apiKeyInput.value.trim();
-    if (keyVal) {
-      customApiKey = keyVal;
-      localStorage.setItem('thananjayan_openai_key', keyVal);
-      showToast('OpenAI API Key saved securely in your browser!');
-    } else {
-      customApiKey = '';
-      localStorage.removeItem('thananjayan_openai_key');
-      showToast('API Key cleared (will fallback to Vercel env variable)');
-    }
-  });
-
-  // Drag and drop setup
-  browseBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    fileInput.click();
-  });
-
-  dropzone.addEventListener('click', () => fileInput.click());
-
-  ['dragenter', 'dragover'].forEach(eventName => {
-    dropzone.addEventListener(eventName, (e) => {
-      e.preventDefault();
-      dropzone.classList.add('dragover');
-    });
-  });
-
-  ['dragleave', 'drop'].forEach(eventName => {
-    dropzone.addEventListener(eventName, (e) => {
-      e.preventDefault();
-      dropzone.classList.remove('dragover');
-    });
-  });
-
-  dropzone.addEventListener('drop', (e) => {
-    const files = e.dataTransfer.files;
-    if (files.length > 0) handleSelectedFile(files[0]);
-  });
-
-  fileInput.addEventListener('change', () => {
-    if (fileInput.files.length > 0) handleSelectedFile(fileInput.files[0]);
-  });
-
-  async function handleSelectedFile(file) {
-    currentUploadedFile = file;
-    dropzone.style.display = 'none';
-    fileBar.style.display = 'flex';
-    fileNameEl.textContent = file.name;
-    fileSizeEl.textContent = `${Math.round(file.size / 1024)} KB`;
-
-    // Process & Chunk Document
-    startIndexBtn.disabled = true;
-    progressWrap.style.display = 'block';
-    progressBar.style.width = '20%';
-    progressLabel.textContent = 'Parsing document text...';
-    progressPercent.textContent = '20%';
-
-    try {
-      let extractedText = '';
-      if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
-        extractedText = await extractTextFromPDF(file);
-      } else {
-        extractedText = await file.text();
-      }
-
-      progressBar.style.width = '60%';
-      progressLabel.textContent = 'Performing semantic chunking...';
-      progressPercent.textContent = '60%';
-
-      parsedChunks = chunkDocumentText(extractedText, file.name);
-
-      progressBar.style.width = '100%';
-      progressLabel.textContent = `Extracted ${parsedChunks.length} semantic chunks!`;
-      progressPercent.textContent = '100%';
-
-      // Render chunk preview
-      renderChunksPreview(parsedChunks);
-      startIndexBtn.disabled = false;
-      showToast(`Document parsed into ${parsedChunks.length} chunks. Ready to index!`);
-
-    } catch (err) {
-      console.error('Error parsing file:', err);
-      progressLabel.textContent = `Error: ${err.message}`;
-      showToast('Failed to parse document. Please try a valid text or PDF file.');
-    }
-  }
-
-  removeFileBtn.addEventListener('click', () => {
-    currentUploadedFile = null;
-    parsedChunks = [];
-    fileInput.value = '';
-    dropzone.style.display = 'block';
-    fileBar.style.display = 'none';
-    progressWrap.style.display = 'none';
-    previewContainer.style.display = 'none';
-    startIndexBtn.disabled = true;
-  });
-
-  // PDF.js Text Extractor
-  async function extractTextFromPDF(file) {
-    if (!window.pdfjsLib) {
-      throw new Error('PDF.js library is not loaded');
-    }
-    const arrayBuffer = await file.arrayBuffer();
-    const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-    let fullText = '';
-
-    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-      const page = await pdf.getPage(pageNum);
-      const textContent = await page.getTextContent();
-      const pageStrings = textContent.items.map(item => item.str).join(' ');
-      fullText += `\n\n--- Page ${pageNum} ---\n` + pageStrings;
-    }
-
-    return fullText;
-  }
-
-  // Semantic Chunker (Sliding Window with Overlap)
-  function chunkDocumentText(text, filename) {
-    const paragraphs = text
-      .split(/\n\s*\n/)
-      .map(p => p.trim())
-      .filter(p => p.length > 35);
-
-    const chunks = [];
-    let currentChunk = '';
-    let chunkIndex = 0;
-
-    for (const para of paragraphs) {
-      if ((currentChunk + ' ' + para).length > 600 && currentChunk.length > 100) {
-        chunks.push({
-          id: `chunk_${chunkIndex}`,
-          title: `Section ${chunkIndex + 1} (${filename})`,
-          category: 'Resume Knowledge',
-          text: currentChunk.trim(),
-          embedding: []
-        });
-        chunkIndex++;
-        // 120-char overlap
-        currentChunk = currentChunk.slice(-120) + ' ' + para;
-      } else {
-        currentChunk += (currentChunk ? '\n' : '') + para;
-      }
-    }
-
-    if (currentChunk.trim().length > 20) {
-      chunks.push({
-        id: `chunk_${chunkIndex}`,
-        title: `Section ${chunkIndex + 1} (${filename})`,
-        category: 'Resume Knowledge',
-        text: currentChunk.trim(),
-        embedding: []
-      });
-    }
-
-    return chunks;
-  }
-
-  function renderChunksPreview(chunks) {
-    previewContainer.style.display = 'block';
-    previewCount.textContent = chunks.length;
-    previewList.innerHTML = '';
-
-    chunks.forEach((c, idx) => {
-      const item = document.createElement('div');
-      item.className = 'chunk-preview-item';
-      item.innerHTML = `
-        <div class="chunk-preview-title">${idx + 1}. ${c.title}</div>
-        <div>${c.text.substring(0, 160)}...</div>
-      `;
-      previewList.appendChild(item);
-    });
-  }
-
-  if (toggleChunksBtn) {
-    toggleChunksBtn.addEventListener('click', () => {
-      const isHidden = previewList.style.display === 'none';
-      previewList.style.display = isHidden ? 'flex' : 'none';
-      const chevron = document.getElementById('chunks-chevron');
-      if (chevron) {
-        chevron.className = isHidden ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down';
-      }
-    });
-  }
-
-  // Trigger Re-indexing with OpenAI Embeddings
-  startIndexBtn.addEventListener('click', async () => {
-    if (!parsedChunks || parsedChunks.length === 0) return;
-
-    startIndexBtn.disabled = true;
-    progressBar.style.width = '30%';
-    progressLabel.textContent = 'Calling OpenAI Embeddings API (text-embedding-3-small)...';
-    progressPercent.textContent = '30%';
-
-    try {
-      let indexResult = null;
-      let usedServerless = false;
-
-      // 1. Attempt Vercel serverless endpoint first
-      try {
-        const response = await fetch('/api/index-cv', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chunks: parsedChunks,
-            documentTitle: currentUploadedFile ? currentUploadedFile.name : 'Uploaded_CV.pdf',
-            apiKey: customApiKey || undefined
-          })
-        });
-
-        if (response.ok) {
-          const resData = await response.json();
-          indexResult = resData.index;
-          usedServerless = true;
-        } else if (response.status !== 405 && response.status !== 404) {
-          const errJson = await response.json().catch(() => ({}));
-          throw new Error(errJson.error || errJson.details || `Indexing failed (${response.status})`);
-        }
-      } catch (netErr) {
-        console.warn('Serverless endpoint not reachable, trying client-side indexing:', netErr);
-      }
-
-      // 2. Direct browser fallback if running on static local server (e.g. VS Code Live Server 405)
-      if (!usedServerless) {
-        if (!customApiKey) {
-          throw new Error('Static local server detected (Live Server). Please enter and save your OpenAI API Key above to index directly, or run with "vercel dev".');
-        }
-
-        console.log('Static dev server (405) detected. Invoking OpenAI Embeddings directly from browser...');
-        progressLabel.textContent = 'Calling OpenAI Embeddings API directly from browser...';
-        progressBar.style.width = '60%';
-        progressPercent.textContent = '60%';
-
-        const texts = parsedChunks.map(c => `${c.title || ''}: ${c.text}`);
-        const embedData = await callOpenAIEmbeddingsDirect(texts, customApiKey);
-
-        const indexedChunks = parsedChunks.map((chunk, index) => ({
-          ...chunk,
-          embedding: embedData.data[index].embedding
-        }));
-
-        indexResult = {
-          lastIndexed: new Date().toISOString(),
-          documentTitle: currentUploadedFile ? currentUploadedFile.name : 'Uploaded_CV.pdf',
-          embeddingModel: 'text-embedding-3-small',
-          totalChunks: indexedChunks.length,
-          chunks: indexedChunks
-        };
-      }
-
-      activeCVIndex = indexResult;
-      localStorage.setItem('thananjayan_active_index', JSON.stringify(activeCVIndex));
-
-      progressBar.style.width = '100%';
-      progressLabel.textContent = `Completed! ${activeCVIndex.chunks.length} chunks indexed.`;
-      progressPercent.textContent = '100%';
-
-      updateAdminStatusUI();
-
-      if (usedServerless) {
-        showToast('Saved directly to data/cv_index.json! Push to Vercel to update live bot.');
-      } else {
-        // Auto-download file for static Live Server user so it's ready to put into data/
-        triggerDownloadIndex();
-        showToast('Downloaded cv_index.json! Move it into data/ and push to Vercel.');
-      }
-
-    } catch (err) {
-      console.error('Re-indexing error:', err);
-      progressLabel.textContent = `Failed: ${err.message}`;
-      showToast(`Error: ${err.message}`);
-    } finally {
-      startIndexBtn.disabled = false;
-    }
-  });
-
-  function triggerDownloadIndex() {
-    if (!activeCVIndex) return;
-    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(activeCVIndex, null, 2));
-    const dlAnchor = document.createElement('a');
-    dlAnchor.setAttribute('href', dataStr);
-    dlAnchor.setAttribute('download', 'cv_index.json');
-    document.body.appendChild(dlAnchor);
-    dlAnchor.click();
-    dlAnchor.remove();
-  }
-
-  // Download cv_index.json to commit permanently to repository
-  downloadIndexBtn.addEventListener('click', () => {
-    if (!activeCVIndex) {
-      showToast('No active index to download');
-      return;
-    }
-    triggerDownloadIndex();
-    showToast('Downloaded cv_index.json! Move it into data/ and git push to Vercel.');
-  });
-}
-
-/* ===================================================================
-   7. Navigation & UI Helpers
+   6. Navigation & UI Helpers
    =================================================================== */
 function initNavigation() {
   const header = document.querySelector('.site-header');

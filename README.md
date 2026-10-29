@@ -33,35 +33,13 @@ Ready for one-click deployment to **Vercel**.
 
 ## 🚀 How to Re-Index and Push to Vercel
 
-### Method 1: Using the Local Node Server (Recommended — Direct Disk Save)
+### Managing & Re-Indexing the Knowledge Base
 
-1. Start the local server in your project folder:
-   ```bash
-   node server.js
-   ```
-2. Open **[http://localhost:3000](http://localhost:3000)** in your browser.
-3. Click **`RAG Admin`** in the footer (passcode: `admin123`).
-4. Paste your OpenAI API key and drop your new CV (PDF / TXT).
-5. Click **"Re-Index CV Now"**.
-   - The server will generate the embeddings and **write directly to `data/cv_index.json` on your disk**.
-6. Commit and push to Vercel:
-   ```bash
-   git add data/cv_index.json
-   git commit -m "feat: update permanent vector database"
-   git push origin main
-   ```
-
----
-
-### Method 2: Using VS Code Live Server
-
-1. Open the site via Live Server (`http://127.0.0.1:5500/` or `5502/`).
-2. Open **`RAG Admin`** (passcode: `admin123`), paste your OpenAI key, and upload your CV.
-3. Click **"Re-Index CV Now"**.
-   - Because Live Server is static, it will generate the embeddings and **automatically download `cv_index.json`** to your Downloads folder.
-4. Move `Downloads/cv_index.json` into your project's `data/` folder:
-   `portfolio/data/cv_index.json`
-5. Commit and push:
+1. **Permanent Vector Store**:
+   The knowledge base embeddings are permanently stored in [`data/cv_index.json`](file:///d:/Thananjayan%20-%20own%20products/portfolio/data/cv_index.json).
+2. **Indexing Script**:
+   When updating your CV profile, generate vector embeddings locally and commit `data/cv_index.json` to Git.
+3. Commit and push to Vercel:
    ```bash
    git add data/cv_index.json
    git commit -m "feat: update permanent vector database"
