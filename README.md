@@ -1,95 +1,102 @@
-# Thananjayan.ai — AI Full-Stack Engineer Portfolio & Dynamic RAG System
+# Thananjayan.ai — AI Full-Stack Engineer Portfolio & Permanent RAG System
 
-A modern, high-performance portfolio website for **Thananjayan Aruljothy** (AI Full-Stack Engineer), built with a futuristic dark neural aesthetic, interactive circuit board skill tree, project showcase, and a **Retrieval-Augmented Generation (RAG)** system with a **dynamic CV uploader & re-indexer**.
+A modern, high-performance portfolio website for **Thananjayan Aruljothy** (AI Full-Stack Engineer), built with a futuristic dark neural aesthetic, interactive circuit board skill tree, project showcase, and a **Retrieval-Augmented Generation (RAG)** system with a **permanent vector database**.
 
 Ready for one-click deployment to **Vercel**.
 
 ---
 
-## ⚡ What’s Included
+## ⚡ Architecture: Permanent RAG on Vercel
 
-1. **Futuristic Neural Aesthetic UI**:
-   - Neural constellation particle canvas background.
-   - Hero section with glowing brackets `{Thananjayan Aruljothy}`, transparent cutout photo with artistic glowing splash backdrop, and floating tech badges.
-   - Interactive macOS terminal with bio summary and copy button.
-   - Neural circuit board with interactive tech nodes (*Python, Flask, OpenAI, AWS, Gemini, Fabric.js, Three.js, RAG*), displaying live proficiency percentages and detail tags.
-   - Featured projects with connected circuit lines.
-   - Verified credentials (*Salesforce Superbadge, Lightning Specialist, EducateHacks Winner*).
-
-2. **RAG AI Assistant ("Ask My Bot")**:
-   - Animated 3D robot mascot with glowing eyes, pulsing antenna, and `"Hello!"` speech bubble.
-   - One-click prompt chips and live conversational query input.
-   - **Vector Cosine Similarity Search**: Matches user queries against 1536-dimensional embeddings generated with `text-embedding-3-small`.
-   - **Context-Grounded LLM Generation**: Uses `gpt-4o-mini` with source citations.
-
-3. **Dynamic CV Uploader & Admin Re-Indexer**:
-   - Discreet **`RAG Admin`** lock button in the footer.
-   - Passcode protected (default: `admin123` or `thananjayan2026`).
-   - Drag-and-drop new CVs (PDF / TXT) directly in your browser.
-   - In-browser PDF text parsing via PDF.js with automated semantic sliding-window chunking.
-   - Calls `/api/index-cv` to re-embed all chunks with OpenAI.
-   - Immediately updates the live chatbot with your new resume data, saves to `localStorage`, and provides a one-click button to download the updated `cv_index.json`.
-
----
-
-## 🚀 Running Locally
-
-```bash
-# Using Python
-python -m http.server 3000
-
-# Or using Node serve
-npx serve .
+```
+[ Local Admin: Upload & Re-Index CV ]
+                   │
+                   ▼ (Calls OpenAI text-embedding-3-small)
+[ Generates 1536-Dim Vector Embeddings ]
+                   │
+                   ▼ (Saved to project disk)
+[ data/cv_index.json ] ──► git push origin main ──► [ Vercel Production ]
+                                                              │
+                                                              ▼
+                                                 All Public Visitors Query 24/7
+                                                 (Grounded Answers via gpt-4o-mini)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+1. **Single Source of Truth**:
+   The entire knowledge base and vector embeddings live permanently in [`data/cv_index.json`](file:///d:/Thananjayan%20-%20own%20products/portfolio/data/cv_index.json).
+2. **Never Lost**:
+   No reliance on browser `localStorage` or session cache. Works in incognito, on mobile, across all devices, forever.
+3. **Zero Extra Cloud DB Costs**:
+   Self-contained serverless vector search running directly inside Vercel Serverless Functions (`/api/chat`).
 
 ---
 
-## 🔑 Setting Your OpenAI API Key
+## 🚀 How to Re-Index and Push to Vercel
 
-You can configure your `OPENAI_API_KEY` in two ways:
+### Method 1: Using the Local Node Server (Recommended — Direct Disk Save)
 
-1. **Via the Website UI (Admin Modal)**:
-   - Click the **`RAG Admin`** button in the footer.
-   - Enter passcode `admin123`.
-   - Paste your `sk-...` OpenAI key and click **Save Key** (persists in your browser).
-2. **Via Vercel Environment Variables (Recommended for Production)**:
-   - In your Vercel Project Dashboard, navigate to **Settings** → **Environment Variables**.
-   - Key: `OPENAI_API_KEY`
-   - Value: `your_openai_api_key_here`
-
----
-
-## 🌐 Deploying to Vercel
-
-```bash
-git add .
-git commit -m "feat: complete portfolio with dynamic RAG uploader and Vercel serverless endpoints"
-git push origin main
-```
-
-1. Go to [vercel.com](https://vercel.com) and click **"Add New Project"**.
-2. Select your `Thananjayan91/portfolio` repository.
-3. In **Environment Variables**, add `OPENAI_API_KEY`.
-4. Click **Deploy**!
+1. Start the local server in your project folder:
+   ```bash
+   node server.js
+   ```
+2. Open **[http://localhost:3000](http://localhost:3000)** in your browser.
+3. Click **`RAG Admin`** in the footer (passcode: `admin123`).
+4. Paste your OpenAI API key and drop your new CV (PDF / TXT).
+5. Click **"Re-Index CV Now"**.
+   - The server will generate the embeddings and **write directly to `data/cv_index.json` on your disk**.
+6. Commit and push to Vercel:
+   ```bash
+   git add data/cv_index.json
+   git commit -m "feat: update permanent vector database"
+   git push origin main
+   ```
 
 ---
 
-## 📁 Project Architecture
+### Method 2: Using VS Code Live Server
+
+1. Open the site via Live Server (`http://127.0.0.1:5500/` or `5502/`).
+2. Open **`RAG Admin`** (passcode: `admin123`), paste your OpenAI key, and upload your CV.
+3. Click **"Re-Index CV Now"**.
+   - Because Live Server is static, it will generate the embeddings and **automatically download `cv_index.json`** to your Downloads folder.
+4. Move `Downloads/cv_index.json` into your project's `data/` folder:
+   `portfolio/data/cv_index.json`
+5. Commit and push:
+   ```bash
+   git add data/cv_index.json
+   git commit -m "feat: update permanent vector database"
+   git push origin main
+   ```
+
+---
+
+## 🔑 Setting Your OpenAI API Key on Vercel
+
+In your [Vercel Project Dashboard](https://vercel.com):
+1. Navigate to **Settings** → **Environment Variables**.
+2. Add:
+   - **Key**: `OPENAI_API_KEY`
+   - **Value**: `sk-your_openai_api_key_here`
+3. Click **Save**. All visitor queries to `/api/chat` will now securely use this key.
+
+---
+
+## 📁 Project Structure
 
 ```
 portfolio/
 ├── index.html               # Main website markup & admin modal
-├── style.css                # Dark neural theme, animations, admin UI & responsiveness
-├── index.js                 # Background canvas, circuit logic, RAG client & admin controller
+├── style.css                # Dark neural theme, animations & responsiveness
+├── index.js                 # Neural canvas, circuit interactivity & RAG client
+├── server.js                # Zero-dependency local dev server with direct disk write
+├── package.json             # ES Module configuration
 ├── Thananjayan_hero.png     # Cutout portrait photo
 ├── Thananjayan_CV.pdf       # Verified PDF Resume
 ├── data/
-│   └── cv_index.json        # Bundled vector knowledge base & chunks
+│   └── cv_index.json        # Permanent vector database (chunks + 1536-dim embeddings)
 ├── api/
-│   ├── chat.js              # Serverless function: Cosine similarity + GPT-4o-mini
-│   └── index-cv.js          # Serverless function: OpenAI text-embedding-3-small
+│   ├── chat.js              # Vercel Serverless Function (Cosine similarity + GPT-4o-mini)
+│   └── index-cv.js          # Vercel Serverless Function (OpenAI text-embedding-3-small)
 ├── vercel.json              # Vercel deployment configuration
 └── .env.example             # Environment variable template
 ```

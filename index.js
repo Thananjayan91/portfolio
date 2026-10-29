@@ -85,25 +85,27 @@ async function callOpenAIChatDirect(query, contextText, apiKey) {
   return data.choices?.[0]?.message?.content;
 }
 async function loadInitialVectorIndex() {
+  // Always prioritize the committed permanent data/cv_index.json
+  try {
+    const res = await fetch('./data/cv_index.json?v=' + Date.now());
+    if (res.ok) {
+      activeCVIndex = await res.json();
+      updateAdminStatusUI();
+      return;
+    }
+  } catch (err) {
+    console.warn('Could not load data/cv_index.json:', err);
+  }
+
+  // Secondary fallback to localStorage if available
   const cached = localStorage.getItem('thananjayan_active_index');
   if (cached) {
     try {
       activeCVIndex = JSON.parse(cached);
       updateAdminStatusUI();
-      return;
     } catch (e) {
       console.warn('Could not parse cached index');
     }
-  }
-
-  try {
-    const res = await fetch('./data/cv_index.json');
-    if (res.ok) {
-      activeCVIndex = await res.json();
-      updateAdminStatusUI();
-    }
-  } catch (err) {
-    console.warn('Could not load data/cv_index.json:', err);
   }
 }
 
@@ -1001,11 +1003,18 @@ function initAdminRAGModal() {
       localStorage.setItem('thananjayan_active_index', JSON.stringify(activeCVIndex));
 
       progressBar.style.width = '100%';
-      progressLabel.textContent = `Completed! ${activeCVIndex.chunks.length} chunks indexed as new.`;
+      progressLabel.textContent = `Completed! ${activeCVIndex.chunks.length} chunks indexed.`;
       progressPercent.textContent = '100%';
 
       updateAdminStatusUI();
-      showToast('CV Re-indexed successfully! Bot is updated with your new data.');
+
+      if (usedServerless) {
+        showToast('Saved directly to data/cv_index.json! Push to Vercel to update live bot.');
+      } else {
+        // Auto-download file for static Live Server user so it's ready to put into data/
+        triggerDownloadIndex();
+        showToast('Downloaded cv_index.json! Move it into data/ and push to Vercel.');
+      }
 
     } catch (err) {
       console.error('Re-indexing error:', err);
@@ -1016,12 +1025,8 @@ function initAdminRAGModal() {
     }
   });
 
-  // Download cv_index.json to commit permanently to repository
-  downloadIndexBtn.addEventListener('click', () => {
-    if (!activeCVIndex) {
-      showToast('No active index to download');
-      return;
-    }
+  function triggerDownloadIndex() {
+    if (!activeCVIndex) return;
     const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(activeCVIndex, null, 2));
     const dlAnchor = document.createElement('a');
     dlAnchor.setAttribute('href', dataStr);
@@ -1029,7 +1034,16 @@ function initAdminRAGModal() {
     document.body.appendChild(dlAnchor);
     dlAnchor.click();
     dlAnchor.remove();
-    showToast('Downloaded cv_index.json! Place it into data/ to commit to Vercel.');
+  }
+
+  // Download cv_index.json to commit permanently to repository
+  downloadIndexBtn.addEventListener('click', () => {
+    if (!activeCVIndex) {
+      showToast('No active index to download');
+      return;
+    }
+    triggerDownloadIndex();
+    showToast('Downloaded cv_index.json! Move it into data/ and git push to Vercel.');
   });
 }
 
