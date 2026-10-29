@@ -97,7 +97,7 @@ const server = http.createServer(async (req, res) => {
 
         const resultIndex = {
           lastIndexed: new Date().toISOString(),
-          documentTitle: payload.documentTitle || 'Thananjayan_CV.pdf',
+          documentTitle: payload.documentTitle || 'Thananjayan_Aruljothy_CV.pdf',
           embeddingModel: 'text-embedding-3-small',
           totalChunks: indexedChunks.length,
           chunks: indexedChunks

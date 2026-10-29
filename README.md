@@ -91,7 +91,7 @@ portfolio/
 ├── server.js                # Zero-dependency local dev server with direct disk write
 ├── package.json             # ES Module configuration
 ├── Thananjayan_hero.png     # Cutout portrait photo
-├── Thananjayan_CV.pdf       # Verified PDF Resume
+├── Thananjayan_Aruljothy_CV.pdf # Master PDF Resume (Downloadable)
 ├── data/
 │   └── cv_index.json        # Permanent vector database (chunks + 1536-dim embeddings)
 ├── api/

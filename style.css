@@ -1266,14 +1266,15 @@ body {
 }
 
 .bot-messages-wrap {
-  min-height: 240px;
-  max-height: 340px;
+  min-height: 260px;
+  max-height: 420px;
   overflow-y: auto;
   padding-right: 0.5rem;
   display: flex;
   flex-direction: column;
   gap: 1.1rem;
   margin-bottom: 1.25rem;
+  transition: max-height var(--transition-smooth);
 }
 
 /* Custom scrollbar */

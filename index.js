@@ -472,6 +472,12 @@ function initRagChatbot() {
     const query = rawQuery.trim();
     if (!query) return;
 
+    // Remove suggested prompt chips on first question to maximize chat room
+    const promptChipsContainer = document.querySelector('.bot-prompt-chips');
+    if (promptChipsContainer) {
+      promptChipsContainer.style.display = 'none';
+    }
+
     appendMessage('user', query);
     chatInput.value = '';
     chatInput.disabled = true;
@@ -651,6 +657,11 @@ function initRagChatbot() {
           </div>
         </div>
       `;
+      // Restore suggested prompt chips when chat is cleared
+      const promptChipsContainer = document.querySelector('.bot-prompt-chips');
+      if (promptChipsContainer) {
+        promptChipsContainer.style.display = 'grid';
+      }
     });
   }
 }
