@@ -1,191 +1,812 @@
 <!DOCTYPE html>
-<html>
-	<head>
-		<meta charset=utf-8><link rel="stylesheet" href="./style.css">
-        <script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
-        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r58/three.min.js"></script> -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha512-dLxUelApnYxpLt6K2iomGngnHO83iUvZytA3YjDUCjT0HDOHKXnVYdf3hU4JjM8uEhxf9nD1/ey98U3t2vZ0qQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-        <script src="https://rawgithub.com/mrdoob/three.js/8673cc801c8887ac143b6dc4535c712ff7bf4af4/examples/js/controls/OrbitControls.js"></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-        <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-        <script type="text/javascript">
-            var withd = window.innerWidth
-            var hait = window.innerHeight
-        </script>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Thananjayan Aruljothy</title>
-	</head>
-    <body>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thananjayan Aruljothy | AI Full-Stack Engineer & LLM Developer</title>
+  <meta name="description" content="Portfolio of Thananjayan Aruljothy - AI Full-Stack Engineer specializing in LLM applications, Python Flask, OpenAI API, Fabric.js, and Cloud Infrastructure." />
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
+  
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <!-- Background Interactive Canvas (Neural Stars & Constellation) -->
+  <canvas id="neural-canvas"></canvas>
+
+  <!-- Ambient Glow Orbs -->
+  <div class="glow-orb orb-top-left"></div>
+  <div class="glow-orb orb-middle-right"></div>
+  <div class="glow-orb orb-bottom-left"></div>
+
+  <!-- Header / Navigation -->
+  <header class="site-header">
+    <div class="nav-container">
+      <a href="#" class="brand-logo">
+        <span class="logo-name">Thananjayan</span><span class="logo-accent">.ai</span>
+        <span class="pulse-dot"></span>
+      </a>
+
+      <nav class="nav-links" id="nav-menu">
+        <a href="#about" class="nav-link">About me</a>
+        <a href="#skills" class="nav-link">Skills</a>
+        <a href="#projects" class="nav-link">Projects</a>
+        <a href="#certificates" class="nav-link">Certificates</a>
+        <a href="#ask-bot" class="nav-link bot-nav-link">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Ask my bot
+        </a>
+        <a href="#contact" class="nav-link">Contact me</a>
+      </nav>
+
+      <button class="mobile-menu-btn" id="mobile-toggle" aria-label="Toggle navigation">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="page-content">
+    
+    <!-- Hero Section -->
+    <section class="hero-section" id="hero">
+      <div class="section-container hero-grid">
         
-        <canvas id="bg"></canvas>
-    
-        <main>
-    
-          <header>
-            <h2>Thananjayan Aruljothy</h2>
-            <!-- <p>National Award Winning Innovator | A.I enthusiast | Computational NeuroScientist | Software Developer </p> -->
-            <p>Web Design | Javascript | 3 JS | Open AI | Python | MySQL | Salesforce  </p>
-          </header>
-    
-    
-          <!-- <blockquote>
-            <p>I like developing tools using technology that makes peoples lives easier</p>
-          </blockquote> -->
-    
-          <section>
-            <h2>📜 About me</h2>
-            <p>
-                I am currently in the process of transitioning into a career in
-                Software Engineering. I have always been interested in the
-                world of technology and have a strong background in Web
-                Designing.
-            </p>
-    
-            <p>
-                I am a quick learner and am always looking for opportunities
-                to expand my skill set. I am confident that with the right
-                guidance and training, I will be able to excel in a career in IT. 
-            </p>
-    
-    
-          </section>
-    
-          <section class="light">
+        <!-- Left Hero Content -->
+        <div class="hero-text-col">
+          <div class="hero-status-pill">
+            <span class="status-indicator"></span> Available for AI Engineering & Full-Stack Projects
+          </div>
+          
+          <h1 class="hero-greeting">Hi, I am</h1>
+          <h2 class="hero-name"><span class="bracket">{</span><span class="gradient-text">Thananjayan Aruljothy</span><span class="bracket">}</span></h2>
+          
+          <p class="hero-bio">
+            I am an <strong>AI Full-Stack Engineer</strong> specializing in building intelligent web applications powered by <strong>Large Language Models (LLMs)</strong>, Generative AI, Python Flask, and modern cloud architectures.
+          </p>
+
+          <div class="hero-actions">
+            <a href="./Thananjayan_CV.pdf" download="Thananjayan_Aruljothy_CV.pdf" class="btn btn-primary" id="download-cv-btn">
+              <i class="fa-solid fa-file-arrow-down"></i>
+              <span>Download CV</span>
+            </a>
+            <a href="#contact" class="btn btn-secondary">
+              <span>Start Project</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+
+          <div class="hero-badges">
+            <div class="badge-item">
+              <span class="badge-num">3+</span>
+              <span class="badge-lbl">Years Experience</span>
+            </div>
+            <div class="badge-divider"></div>
+            <div class="badge-item">
+              <span class="badge-num">10+</span>
+              <span class="badge-lbl">AI Models & APIs</span>
+            </div>
+            <div class="badge-divider"></div>
+            <div class="badge-item">
+              <span class="badge-num">AWS</span>
+              <span class="badge-lbl">Cloud Deployment</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Hero Visual with Purple Splash -->
+        <div class="hero-visual-col">
+          <div class="portrait-wrapper">
+            <!-- Dynamic Neon Splash Backdrop -->
+            <div class="splash-backdrop"></div>
+            <div class="portrait-glow"></div>
             
-            <h2>👩🏽‍🚀 Education</h2>
-    
-            <h3>
-                Bachelor of Information Technology (BIT)
-            </h3>
-            <h4>2020 - 2023 | University of Colombo - UCSC</h4>
+            <!-- Hero Photo Cutout -->
+            <img src="./Thananjayan_hero.png" alt="Thananjayan Aruljothy - AI Full Stack Engineer" class="portrait-img" />
             
-            <h3>
-                BSc Transport & Logistics Management
-            </h3>
-            <h4>2011 - 2016 | University of Moratuwa</h4>
+            <!-- Floating Neural Tech Chips -->
+            <div class="floating-tech-chip chip-1">
+              <i class="fa-brands fa-python"></i> Python & Flask
+            </div>
+            <div class="floating-tech-chip chip-2">
+              <i class="fa-solid fa-brain"></i> OpenAI & LLMs
+            </div>
+            <div class="floating-tech-chip chip-3">
+              <i class="fa-brands fa-aws"></i> AWS Cloud
+            </div>
+          </div>
+        </div>
 
-        </section> 
+      </div>
+    </section>
 
+    <!-- About Me Section -->
+    <section class="section about-section" id="about">
+      <div class="section-container about-grid">
+        
+        <div class="section-heading-col">
+          <h2 class="section-title">About me</h2>
+          <p class="section-subtitle">Bridging Generative AI with scalable web software engineering.</p>
+          
+          <div class="about-highlights">
+            <div class="highlight-card">
+              <i class="fa-solid fa-microchip icon-accent"></i>
+              <div>
+                <h4>Generative AI & LLMs</h4>
+                <p>Prompt engineering, agentic workflows, multi-modal pipelines, ElevenLabs voice synthesis & video models.</p>
+              </div>
+            </div>
 
+            <div class="highlight-card">
+              <i class="fa-solid fa-server icon-accent"></i>
+              <div>
+                <h4>Full-Stack & Cloud</h4>
+                <p>Python Flask RESTful backends, Fabric.js interactive canvas, AWS EC2 & Lambda deployments.</p>
+              </div>
+            </div>
 
-            <!-- <section class="left">
-            <h2>🏆 Accomplishments</h2>
-    
+            <div class="highlight-card">
+              <i class="fa-solid fa-graduation-cap icon-accent"></i>
+              <div>
+                <h4>Education & Analytics</h4>
+                <p>BSc in Information Technology (Univ. of Colombo) & BSc (Hons) in Logistics (Univ. of Moratuwa).</p>
+              </div>
+            </div>
+          </div>
+        </div>
 
-            <p>
-<h3>
-                National Ingenuity Awards 2021 
-Best Innovative Product of the Year Award     </h3>           
-Won the best Innovative product my Invention on project LetMeKnow, which an early diagnosis and alerting device with a built in SAAS solution for healthcare Hospitals.
+        <!-- IDE / Code Terminal Window -->
+        <div class="about-terminal-col">
+          <div class="code-terminal">
+            <div class="terminal-header">
+              <div class="terminal-dots">
+                <span class="dot dot-red"></span>
+                <span class="dot dot-yellow"></span>
+                <span class="dot dot-green"></span>
+              </div>
+              <div class="terminal-title">
+                <i class="fa-solid fa-terminal"></i> thananjayan@engineer: ~/profile
+              </div>
+              <div class="terminal-action-icons">
+                <i class="fa-regular fa-copy" id="copy-bio-btn" title="Copy Bio"></i>
+              </div>
+            </div>
+
+            <!-- Terminal Search Prompt Bar -->
+            <div class="terminal-search-bar">
+              <span class="ai-sparkle">✦</span>
+              <span class="terminal-prompt-cmd">profile.getSummary(format="detailed")</span>
+            </div>
+
+            <div class="terminal-body" id="bio-text">
+              <p class="term-lead">
+                Thananjayan Aruljothy is an AI Full-Stack Developer specializing in building intelligent applications powered by Large Language Models (LLMs), Generative AI, and modern cloud technologies.
+              </p>
+              <p>
+                Currently serving as an <strong>AI Full Stack Engineer at Flipick</strong>, he architects AI-driven platforms with Python Flask, OpenAI API, Claude AI, Google Gemini, and ElevenLabs. He creates interactive web editors using Fabric.js canvas technology and handles end-to-end deployments on AWS EC2 environments.
+              </p>
+              <p>
+                Previously contributed to AI-integrated EdTech products at Eureka Innovations utilizing HTML5, CSS3, JavaScript, and Three.js 3D rendering. With a dual background in IT and analytical optimization, he transforms complex problems into streamlined, high-performance web products.
+              </p>
+              <div class="terminal-footer-meta">
+                <span class="meta-tag"><i class="fa-solid fa-location-dot"></i> Sri Lanka</span>
+                <span class="meta-tag"><i class="fa-solid fa-language"></i> English, Tamil, Sinhala</span>
+                <span class="meta-tag"><i class="fa-solid fa-circle-check"></i> Available for Remote / Global Roles</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- My Skills Section (Interactive Circuit / Neural Board) -->
+    <section class="section skills-section" id="skills">
+      <div class="section-container">
+        
+        <div class="skills-layout">
+          
+          <div class="skills-info-col">
+            <h2 class="section-title">My Skills</h2>
+            <p class="section-lead">
+              A comprehensive technical stack spanning frontier AI, cloud computing, and full-stack software architecture.
             </p>
 
-             <p>
-                <h3>Winner Haxmas 2021</h3>
-Winner of Haxmas 2021 which is a product development hackathon held for a period of 3 months. became the Champions of the competition for developing a Telemedicine SaaS and BaaS, HIPAA compliant platform with mobile, Web and IoT portals.
-</p>
-                
-                <p>
-                    <h3>
-Winner of SLIOT </h3>
-SLIOT which is the largest IoT Hackathon in Srilanka hosted annually by the IESL( Institute of Engineers Srilanka), Proudly my IoT invention named LetMeKnow became the Winner of this Hackathon which was held for a period of 5 months.SLIOT which is the largest IoT Hackathon in Srilanka hosted annually by the IESL( Institute of Engineers Srilanka), Proudly my IoT invention named LetMeKnow became the Winner of this Hackathon which was held for a period of 5 months.
-                </p>
+            <!-- Dynamic Interactive Skill Card (matching screenshot's TensorFlow card) -->
+            <div class="skill-detail-card" id="active-skill-card">
+              <div class="skill-detail-header">
+                <div>
+                  <span class="skill-label-prefix">Skill :</span>
+                  <span class="skill-label-name" id="skill-name">Python & Flask</span>
+                </div>
+                <div class="skill-percentage" id="skill-percent">95%</div>
+              </div>
+              
+              <div class="skill-meter-track">
+                <div class="skill-meter-fill" id="skill-meter" style="width: 95%;"></div>
+              </div>
 
+              <p class="skill-description" id="skill-desc">
+                Core backend language for architecting REST APIs, AI microservices, data processing pipelines, and web applications.
+              </p>
 
-                <p>
-                    <h3>
-SLASSCOM Best Innovation of the Year 2020
+              <div class="skill-tags" id="skill-tags">
+                <span class="skill-pill">Flask</span>
+                <span class="skill-pill">FastAPI</span>
+                <span class="skill-pill">Async IO</span>
+                <span class="skill-pill">AI Automation</span>
+              </div>
+            </div>
 
-                    </h3>
-For developing an IoT related project that is used for crowd monitoring and temperature screening in public places using a thermal vision and Image processing and a real time cloud integrated Web Platform. 
+            <p class="skills-instruction">
+              <i class="fa-solid fa-hand-pointer"></i> Click any node on the neural circuit to explore proficiency & use cases.
             </p>
-    
+          </div>
 
-            <p>
-            <h3>
-                Lifetime Achievement Award
-                
-                                        </h3>
-                                        A Nationally recognized award, received for my Research on Bio-electrogenisis, Mentioned in the award as an Outstanding contribution and Excellent service in the education sector.                                    </p>
+          <!-- Neural Circuit Board Graphics with Interactive Nodes -->
+          <div class="skills-circuit-col">
+            <div class="circuit-board-container">
+              
+              <!-- Circuit SVG Connections -->
+              <svg class="circuit-svg" viewBox="0 0 520 440" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Glowing circuit pathways -->
+                <path d="M 60 120 L 150 120 L 190 70 L 310 70 L 350 130 L 450 130" class="circuit-path path-primary" />
+                <path d="M 150 120 L 150 220 L 230 220 L 270 280 L 370 280" class="circuit-path path-secondary" />
+                <path d="M 190 70 L 240 140 L 330 140 L 370 200 L 450 200" class="circuit-path path-accent" />
+                <path d="M 90 280 L 170 280 L 220 350 L 340 350 L 400 350" class="circuit-path path-primary" />
+                <path d="M 270 280 L 270 380 L 350 380" class="circuit-path path-secondary" />
+                <path d="M 350 130 L 410 70 L 470 70" class="circuit-path path-accent" />
+              </svg>
 
+              <!-- Interactive Node Buttons placed across the circuit -->
+              <button class="circuit-node node-active" style="top: 22%; left: 10%;" data-skill="python" aria-label="Python & Flask">
+                <i class="fa-brands fa-python"></i>
+                <span class="node-label">Python</span>
+              </button>
 
-<p>
-                                        <h3>                                              
-                         
-Presidential Honour                        </h3>
-Honored by the President of the Democratic Socialist Republic of Sri Lanka for the active involvement in Researching Science and Technology Domains and for Excellence in Advanced Biochemistry research as a school student .                                        </p>
+              <button class="circuit-node" style="top: 12%; left: 36%;" data-skill="openai" aria-label="OpenAI & LLM Integration">
+                <i class="fa-solid fa-brain"></i>
+                <span class="node-label">OpenAI</span>
+              </button>
 
+              <button class="circuit-node" style="top: 26%; left: 64%;" data-skill="aws" aria-label="AWS Cloud EC2 & Lambda">
+                <i class="fa-brands fa-aws"></i>
+                <span class="node-label">AWS</span>
+              </button>
 
-          </section> -->
-    
-          <!-- <blockquote>
-            <p>I love to learn Something about everything and everything about something </p>
-          </blockquote> -->
-    
-          <section class="light">
-            <h2>🌮 Work History</h2>
-    
-            <h3>Freelance WEB Designer @ RDK United</h3>
-            <h6>From 2022 Dec</h6>
-            <p>
-                <ul>
-                    <li>Website Designing (WordPress)</li>
-                    <li>SEO Analysis and Google Indexing</li>
-                    <li>Design and optimize landing pages</li>
-                </ul> 
-            </p>
+              <button class="circuit-node" style="top: 12%; left: 86%;" data-skill="gemini" aria-label="Gemini & Claude AI">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <span class="node-label">Gemini</span>
+              </button>
 
-            <h3>Associate Software Engineer @ Eureka Innovations</h3>
-            <h6>2022 Apr - 2022 Nov</h6>
-            <p>
-                <ul>
-                    <li>UI / UX Design - HTML, CSS, Javascript</li>
-                    <li>Connect with Firebase and configuration</li>
-                    <li>Worked with Jira in Eureka and CurveUp</li>
-                    <li>3 JS for 3D rendering</li>
-                </ul>
-                Involved in UI design of AI-integrated Edtech Products: Brainiverse and Xtramark.
-            </p>
+              <button class="circuit-node" style="top: 48%; left: 26%;" data-skill="fabric" aria-label="Fabric.js Canvas">
+                <i class="fa-solid fa-palette"></i>
+                <span class="node-label">Fabric.js</span>
+              </button>
 
-            <h3>Trainee Web Designer (Wordpress) @ Koceansoft</h3>
-            <h6>2022 Jan - 2022 Apr</h6>
-            <p>
-                Developed user-friendly Websites and learned about WordPress, SEO, Adobe XD, and more.
-                <ul>
-                    <li>https://vejaarestaurant.com/</li>
-                    <li>https://www.koceansoft.com/</li>
-                </ul>
-            </p>
+              <button class="circuit-node" style="top: 44%; left: 82%;" data-skill="javascript" aria-label="Modern JavaScript & Web">
+                <i class="fa-brands fa-js"></i>
+                <span class="node-label">JS / TS</span>
+              </button>
 
-            <h3>Logistics Officer @ Siamcity (Insee) Cement</h3>
-            <h6>2016 Apr - 2019 Oct</h6>
-            <p>
-                <ul>
-                    <li>Worked in SAP Environment</li>
-                    <li>Supervise total outbound Logistics operations</li>
-                </ul>
-            </p>
-    
-          </section>
-    
-          <!-- <blockquote>
-            <p>Thanks for watching!</p>
-          </blockquote> -->
+              <button class="circuit-node" style="top: 62%; left: 48%;" data-skill="restapi" aria-label="REST APIs & Microservices">
+                <i class="fa-solid fa-network-wired"></i>
+                <span class="node-label">REST APIs</span>
+              </button>
 
-          <div id="contact">
-            <a href="https://www.linkedin.com/in/thananjayan-aruljothy-63b40458/" class="fa fa-linkedin"></a>
-            <a href="hhttps://github.com/Thananjayan91" class="fa fa-github"></a>
-            <a href="tel:+94778449255" class="fa fa-mobile"></a>
+              <button class="circuit-node" style="top: 76%; left: 16%;" data-skill="threejs" aria-label="Three.js 3D Rendering">
+                <i class="fa-solid fa-cube"></i>
+                <span class="node-label">Three.js</span>
+              </button>
+
+              <button class="circuit-node" style="top: 78%; left: 74%;" data-skill="rag" aria-label="RAG & Vector Search">
+                <i class="fa-solid fa-database"></i>
+                <span class="node-label">RAG & Embeddings</span>
+              </button>
+
+              <button class="circuit-node" style="top: 84%; left: 42%;" data-skill="salesforce" aria-label="Salesforce Specialist">
+                <i class="fa-brands fa-salesforce"></i>
+                <span class="node-label">Salesforce</span>
+              </button>
+
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section class="section projects-section" id="projects">
+      <div class="section-container">
+        
+        <div class="section-title-wrap">
+          <h2 class="section-title">Projects</h2>
+          <p class="section-lead">Check out some of my design and AI projects, meticulously crafted with love and dedication.</p>
+        </div>
+
+        <div class="projects-showcase-grid">
+          
+          <!-- Left: Project Selector List -->
+          <div class="project-selector-col">
+            
+            <div class="project-thumb-card active" data-project="0">
+              <div class="thumb-header">
+                <span class="thumb-index">01</span>
+                <span class="thumb-badge">Featured AI</span>
+              </div>
+              <h4 class="thumb-title">AI Content Studio & Fabric Canvas</h4>
+              <p class="thumb-summary">Intelligent multi-modal content creation platform with LLM integration, Fabric.js interactive canvas, and TTS.</p>
+              <div class="thumb-tags">
+                <span>Python</span><span>Flask</span><span>OpenAI</span><span>Fabric.js</span>
+              </div>
+            </div>
+
+            <div class="project-thumb-card" data-project="1">
+              <div class="thumb-header">
+                <span class="thumb-index">02</span>
+                <span class="thumb-badge">EdTech</span>
+              </div>
+              <h4 class="thumb-title">Brainiverse & Xtramark</h4>
+              <p class="thumb-summary">AI-integrated educational platform featuring interactive Three.js 3D model rendering and responsive interfaces.</p>
+              <div class="thumb-tags">
+                <span>Three.js</span><span>JavaScript</span><span>Firebase</span>
+              </div>
+            </div>
+
+            <div class="project-thumb-card" data-project="2">
+              <div class="thumb-header">
+                <span class="thumb-index">03</span>
+                <span class="thumb-badge">Automation</span>
+              </div>
+              <h4 class="thumb-title">AI Video Generation Pipeline</h4>
+              <p class="thumb-summary">Automated pipeline integrating LLM script generation, ElevenLabs voice synthesis, avatars, and video rendering.</p>
+              <div class="thumb-tags">
+                <span>Python</span><span>ElevenLabs</span><span>AWS EC2</span>
+              </div>
+            </div>
 
           </div>
-    
-        
-        </main>
-        
-        <!-- <script type="module" src="/main.js"></script> -->
-    
-<script src="./index.js"></script>
-    
 
-      </body>
-	
+          <!-- Connecting Circuit Line -->
+          <div class="project-connector-line">
+            <div class="connector-glow-point"></div>
+          </div>
+
+          <!-- Right: Big Project Feature Display -->
+          <div class="project-display-col">
+            <div class="project-feature-card" id="project-detail-card">
+              
+              <div class="feature-media-wrap">
+                <img src="./project_aistudio.jpg" alt="AI Content Studio preview" id="proj-img" class="feature-img" />
+                <div class="feature-media-overlay"></div>
+              </div>
+
+              <div class="feature-info-wrap">
+                <h3 class="feature-title" id="proj-title">AI Content Studio & Fabric Canvas</h3>
+                <p class="feature-description" id="proj-desc">
+                  Architected and deployed an enterprise-grade AI content creation platform at Flipick. Enables users to dynamically prompt LLMs (OpenAI, Claude, Gemini) to generate rich multi-modal assets, then seamlessly customize them on an interactive HTML5 Fabric.js canvas with automated export pipelines.
+                </p>
+
+                <div class="feature-tech-stack" id="proj-stack">
+                  <span class="stack-badge">Python</span>
+                  <span class="stack-badge">Flask</span>
+                  <span class="stack-badge">OpenAI API</span>
+                  <span class="stack-badge">Claude AI</span>
+                  <span class="stack-badge">Fabric.js</span>
+                  <span class="stack-badge">AWS EC2</span>
+                </div>
+
+                <div class="feature-actions">
+                  <a href="https://github.com/Thananjayan91" target="_blank" rel="noopener noreferrer" class="btn btn-outline" id="proj-code-link">
+                    <i class="fa-brands fa-github"></i> View GitHub
+                  </a>
+                  <a href="#ask-bot" class="btn btn-primary" id="proj-demo-link">
+                    <i class="fa-solid fa-sparkles"></i> Ask Bot About This Project
+                  </a>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Certificates Section -->
+    <section class="section cert-section" id="certificates">
+      <div class="section-container">
+        
+        <div class="section-title-wrap">
+          <h2 class="section-title">Certificates</h2>
+          <p class="section-lead">Check out some of my credentials, ranging from Salesforce Superbadge to Cloud and AI.</p>
+        </div>
+
+        <div class="certs-grid">
+          
+          <!-- Cert Card 1 -->
+          <div class="cert-card">
+            <div class="cert-card-inner">
+              <div class="cert-image-container">
+                <img src="./cert_salesforce.jpg" alt="Salesforce Superbadge" class="cert-thumbnail" />
+                <div class="cert-badge-overlay">
+                  <i class="fa-brands fa-salesforce"></i>
+                </div>
+              </div>
+              <div class="cert-content">
+                <span class="cert-issuer">Salesforce Trailhead</span>
+                <h4 class="cert-name">Multi-Factor Authentication & SSO Settings</h4>
+                <p class="cert-details">Superbadge unit credential verifying advanced identity, authentication security, and Single Sign-On implementations.</p>
+                <div class="cert-footer">
+                  <span class="cert-status"><i class="fa-solid fa-circle-check"></i> Verified</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cert Card 2 -->
+          <div class="cert-card">
+            <div class="cert-card-inner">
+              <div class="cert-image-container">
+                <img src="./cert_lightning.jpg" alt="Lightning Experience Specialist" class="cert-thumbnail" />
+                <div class="cert-badge-overlay">
+                  <i class="fa-solid fa-chart-line"></i>
+                </div>
+              </div>
+              <div class="cert-content">
+                <span class="cert-issuer">Salesforce Specialist</span>
+                <h4 class="cert-name">Lightning Experience Reports & Dashboards</h4>
+                <p class="cert-details">Specialist credential for analytics engineering, data visualization, business intelligence, and complex reporting logic.</p>
+                <div class="cert-footer">
+                  <span class="cert-status"><i class="fa-solid fa-circle-check"></i> Verified</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cert Card 3 -->
+          <div class="cert-card">
+            <div class="cert-card-inner">
+              <div class="cert-image-container">
+                <img src="./cert_educatehacks.jpg" alt="EducateHacks Winner" class="cert-thumbnail" />
+                <div class="cert-badge-overlay">
+                  <i class="fa-solid fa-trophy"></i>
+                </div>
+              </div>
+              <div class="cert-content">
+                <span class="cert-issuer">EducateHacks 2023</span>
+                <h4 class="cert-name">EducateHacks AI & EdTech Innovation</h4>
+                <p class="cert-details">Recognized for innovative software engineering, developing modern AI-driven educational technology solutions.</p>
+                <div class="cert-footer">
+                  <span class="cert-status"><i class="fa-solid fa-award"></i> Winner</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Additional Badges Bar -->
+        <div class="cert-strip">
+          <div class="cert-chip">
+            <i class="fa-solid fa-shield-halved"></i> App Customization Specialist
+          </div>
+          <div class="cert-chip">
+            <i class="fa-solid fa-magnifying-glass-chart"></i> SEO Simplified & Web Optimization
+          </div>
+          <div class="cert-chip">
+            <i class="fa-brands fa-aws"></i> AWS Cloud Architecture
+          </div>
+          <div class="cert-chip">
+            <i class="fa-solid fa-robot"></i> Generative AI & Prompt Engineering
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Ask My Bot Section (Interactive RAG Chatbot UI) -->
+    <section class="section bot-section" id="ask-bot">
+      <div class="section-container">
+        
+        <div class="bot-layout">
+          
+          <!-- Left: Chat Interface -->
+          <div class="bot-chat-col">
+            <div class="bot-header-area">
+              <h2 class="section-title">Ask my bot</h2>
+              <p class="bot-subtitle">
+                Powered by a knowledge-base RAG engine loaded with Thananjayan's resume, technical experience, and project archives.
+              </p>
+            </div>
+
+            <!-- Chat Window -->
+            <div class="bot-window">
+              
+              <!-- Message Stream -->
+              <div class="bot-messages-wrap" id="chat-stream">
+                
+                <div class="bot-msg assistant">
+                  <div class="msg-avatar">
+                    <i class="fa-solid fa-robot"></i>
+                  </div>
+                  <div class="msg-bubble">
+                    <p>
+                      Hello! I'm Thananjayan's AI Assistant. Ask me anything about his technical stack, experience with LLMs and Flask, projects, or how to contact him.
+                    </p>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- Quick Question Chips (matching screenshot) -->
+              <div class="bot-prompt-chips">
+                <button class="prompt-chip" data-query="What are the core technical strengths of Thananjayan?">
+                  <span>✦ What are the core technical strengths of Thananjayan?</span>
+                </button>
+                <button class="prompt-chip" data-query="Tell me about his LLM & AI agent projects">
+                  <span>✦ Tell me about his LLM & AI agent projects</span>
+                </button>
+                <button class="prompt-chip" data-query="What is his experience with Python Flask and AWS?">
+                  <span>✦ What is his experience with Python Flask and AWS?</span>
+                </button>
+                <button class="prompt-chip" data-query="What are his educational qualifications & degrees?">
+                  <span>✦ What are his educational qualifications & degrees?</span>
+                </button>
+              </div>
+
+              <!-- Input Area -->
+              <div class="bot-input-bar">
+                <span class="input-sparkle"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
+                <input 
+                  type="text" 
+                  id="chat-input" 
+                  placeholder="Ask any question about Thananjayan's experience or skills..." 
+                  autocomplete="off"
+                />
+                <button id="send-btn" class="send-button" aria-label="Send message">
+                  <i class="fa-solid fa-arrow-up"></i>
+                </button>
+              </div>
+
+              <div class="bot-status-footer">
+                <span class="rag-indicator"><span class="live-dot"></span> Ready for custom RAG backend (`/api/chat`)</span>
+                <button id="clear-chat-btn" class="clear-chat-btn">Clear chat</button>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Right: Robot Mascot Graphic (Matching screenshot) -->
+          <div class="bot-mascot-col">
+            <div class="mascot-wrapper">
+              
+              <!-- Speech Bubble -->
+              <div class="mascot-speech-bubble">
+                <span class="speech-text">Hello!</span>
+                <div class="bubble-arrow"></div>
+              </div>
+
+              <!-- Vector AI Robot Illustration -->
+              <div class="robot-character">
+                <svg viewBox="0 0 200 240" class="robot-svg" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Ambient robot glow -->
+                  <defs>
+                    <radialGradient id="robotGlow" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.6"/>
+                      <stop offset="100%" stop-color="#38bdf8" stop-opacity="0"/>
+                    </radialGradient>
+                    <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#3b82f6"/>
+                      <stop offset="50%" stop-color="#6366f1"/>
+                      <stop offset="100%" stop-color="#4f46e5"/>
+                    </linearGradient>
+                    <linearGradient id="screenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#090d16"/>
+                      <stop offset="100%" stop-color="#1e1b4b"/>
+                    </linearGradient>
+                    <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stop-color="#00f0ff"/>
+                      <stop offset="100%" stop-color="#38bdf8"/>
+                    </linearGradient>
+                  </defs>
+
+                  <!-- Ground shadow / hover pad -->
+                  <ellipse cx="100" cy="225" rx="55" ry="12" fill="#000" opacity="0.4" />
+                  <ellipse cx="100" cy="225" rx="42" ry="8" fill="url(#cyanGrad)" opacity="0.3" />
+
+                  <!-- Antenna with pulsating tip -->
+                  <line x1="100" y1="45" x2="100" y2="25" stroke="#60a5fa" stroke-width="4" stroke-linecap="round"/>
+                  <circle cx="100" cy="20" r="7" fill="#38bdf8" class="antenna-bulb"/>
+
+                  <!-- Ear pods / side sensors -->
+                  <circle cx="45" cy="85" r="14" fill="#4338ca"/>
+                  <circle cx="45" cy="85" r="7" fill="#38bdf8"/>
+                  <circle cx="155" cy="85" r="14" fill="#4338ca"/>
+                  <circle cx="155" cy="85" r="7" fill="#38bdf8"/>
+
+                  <!-- Head Outer Shell -->
+                  <rect x="52" y="45" width="96" height="80" rx="36" fill="url(#bodyGrad)" stroke="#818cf8" stroke-width="2"/>
+                  
+                  <!-- Visor Screen -->
+                  <rect x="62" y="58" width="76" height="54" rx="22" fill="url(#screenGrad)" stroke="#38bdf8" stroke-width="1.5"/>
+
+                  <!-- Glowing Cyan Eyes with Expression -->
+                  <ellipse cx="82" cy="82" rx="9" ry="10" fill="#00f0ff" class="robot-eye eye-left"/>
+                  <ellipse cx="118" cy="82" rx="9" ry="10" fill="#00f0ff" class="robot-eye eye-right"/>
+                  
+                  <!-- Eye Sparkle Highlights -->
+                  <circle cx="85" cy="79" r="3" fill="#ffffff"/>
+                  <circle cx="121" cy="79" r="3" fill="#ffffff"/>
+
+                  <!-- Smile on Visor -->
+                  <path d="M 90 98 Q 100 106 110 98" fill="none" stroke="#00f0ff" stroke-width="2.5" stroke-linecap="round"/>
+
+                  <!-- Neck Connector -->
+                  <rect x="90" y="125" width="20" height="10" rx="4" fill="#312e81"/>
+
+                  <!-- Torso Body -->
+                  <path d="M 65 135 C 65 135, 75 185, 100 185 C 125 185, 135 135, 135 135 Z" fill="url(#bodyGrad)" stroke="#818cf8" stroke-width="1.5"/>
+                  
+                  <!-- Chest Core / AI Orb -->
+                  <circle cx="100" cy="155" r="10" fill="#0369a1" stroke="#38bdf8" stroke-width="1.5"/>
+                  <circle cx="100" cy="155" r="6" fill="#00f0ff" class="core-pulsar"/>
+
+                  <!-- Left Arm (Waving) -->
+                  <path d="M 65 145 C 50 145, 30 130, 28 115 C 26 100, 36 95, 42 105" fill="none" stroke="url(#bodyGrad)" stroke-width="9" stroke-linecap="round"/>
+                  <circle cx="42" cy="104" r="5" fill="#38bdf8"/>
+
+                  <!-- Right Arm (Resting) -->
+                  <path d="M 135 145 C 150 150, 165 165, 160 178" fill="none" stroke="url(#bodyGrad)" stroke-width="9" stroke-linecap="round"/>
+                  <circle cx="160" cy="178" r="5" fill="#38bdf8"/>
+
+                  <!-- Hover Base Cushion -->
+                  <ellipse cx="100" cy="192" rx="22" ry="7" fill="#ffffff" opacity="0.9"/>
+                </svg>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Call to Action Section -->
+    <section class="section cta-section" id="contact">
+      <div class="section-container">
+        
+        <div class="cta-card">
+          <h2 class="cta-title">Let start something greet together</h2>
+          <p class="cta-subtitle">Have an exciting AI project, LLM application, or full-stack opportunity in mind? Let's build something exceptional.</p>
+          
+          <div class="cta-btn-wrap">
+            <a href="mailto:thananjayan1991@yahoo.com?subject=Portfolio%20Inquiry%20-%20AI%20Engineering" class="btn btn-primary cta-btn">
+              <i class="fa-solid fa-paper-plane"></i>
+              <span>Get in touch</span>
+            </a>
+          </div>
+
+          <!-- Flowing Neural / Fiber-Optic Waves (matching bottom of screenshot) -->
+          <div class="neural-fiber-stream">
+            <svg class="fiber-svg" viewBox="0 0 1200 140" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+              <!-- Converging and diverging fiber optic glowing lines -->
+              <path d="M 0 70 C 300 70, 450 70, 550 70 C 650 70, 800 20, 1200 20" stroke="url(#fiberGrad1)" stroke-width="2.5" opacity="0.8"/>
+              <path d="M 0 70 C 300 70, 450 70, 550 70 C 680 70, 820 50, 1200 50" stroke="url(#fiberGrad2)" stroke-width="2" opacity="0.85"/>
+              <path d="M 0 70 C 300 70, 450 70, 550 70 C 700 70, 850 85, 1200 85" stroke="url(#fiberGrad1)" stroke-width="2.5" opacity="0.9"/>
+              <path d="M 0 70 C 300 70, 450 70, 550 70 C 720 70, 880 120, 1200 120" stroke="url(#fiberGrad2)" stroke-width="2" opacity="0.75"/>
+              
+              <!-- Complementary fibers -->
+              <path d="M 0 70 C 200 70, 400 68, 550 70 C 750 72, 900 10, 1200 5" stroke="#38bdf8" stroke-width="1.5" opacity="0.6"/>
+              <path d="M 0 70 C 200 70, 400 72, 550 70 C 750 68, 920 135, 1200 135" stroke="#a855f7" stroke-width="1.5" opacity="0.6"/>
+              
+              <!-- End fiber node dots -->
+              <circle cx="1200" cy="20" r="4" fill="#38bdf8" />
+              <circle cx="1200" cy="50" r="4" fill="#a855f7" />
+              <circle cx="1200" cy="85" r="4" fill="#00f0ff" />
+              <circle cx="1200" cy="120" r="4" fill="#ec4899" />
+
+              <defs>
+                <linearGradient id="fiberGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#0284c7" />
+                  <stop offset="45%" stop-color="#00f0ff" />
+                  <stop offset="70%" stop-color="#8b5cf6" />
+                  <stop offset="100%" stop-color="#ec4899" />
+                </linearGradient>
+                <linearGradient id="fiberGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#0369a1" />
+                  <stop offset="45%" stop-color="#38bdf8" />
+                  <stop offset="75%" stop-color="#6366f1" />
+                  <stop offset="100%" stop-color="#a855f7" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Site Footer (Matching bottom layout in screenshot) -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      
+      <!-- Follow Me Col -->
+      <div class="footer-col follow-col">
+        <h4 class="footer-title">Follow me at :</h4>
+        <div class="social-links-row">
+          <a href="https://www.linkedin.com/in/thananjayan-aruljothy/" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="LinkedIn">
+            <i class="fa-brands fa-linkedin-in"></i>
+          </a>
+          <a href="https://github.com/Thananjayan91" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="GitHub">
+            <i class="fa-brands fa-github"></i>
+          </a>
+          <a href="mailto:thananjayan1991@yahoo.com" class="social-icon" aria-label="Email">
+            <i class="fa-solid fa-envelope"></i>
+          </a>
+          <a href="tel:+94778449255" class="social-icon" aria-label="Phone">
+            <i class="fa-solid fa-phone"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Contact Details Col -->
+      <div class="footer-col contact-col">
+        <div class="footer-item">
+          <span class="footer-icon"><i class="fa-solid fa-mobile-screen"></i></span>
+          <a href="tel:+94778449255">+94 77 844 9255</a>
+        </div>
+        <div class="footer-item">
+          <span class="footer-icon"><i class="fa-regular fa-envelope"></i></span>
+          <a href="mailto:thananjayan1991@yahoo.com">thananjayan1991@yahoo.com</a>
+        </div>
+        <div class="footer-item">
+          <span class="footer-icon"><i class="fa-solid fa-location-dot"></i></span>
+          <span>Sri Lanka</span>
+        </div>
+      </div>
+
+      <!-- Quick Nav Links Col -->
+      <div class="footer-col links-col">
+        <a href="#about">About</a>
+        <a href="#skills">Skills</a>
+        <a href="#projects">Projects</a>
+        <a href="#certificates">Certificates</a>
+        <a href="#ask-bot">Ask AI Bot</a>
+      </div>
+
+    </div>
+
+    <!-- Copyright -->
+    <div class="copyright-bar">
+      <p>&copy; 2026 Thananjayan Aruljothy. All rights reserved. Deployed on Vercel.</p>
+    </div>
+  </footer>
+
+  <!-- Contact & Feedback Toast -->
+  <div class="toast-notification" id="toast">
+    <i class="fa-solid fa-circle-check"></i>
+    <span id="toast-message">Message copied!</span>
+  </div>
+
+  <!-- Scripts -->
+  <script src="./index.js"></script>
+</body>
+</html>
+
 </html>
