@@ -159,9 +159,42 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // 3. Serve Static Files
+  // 3. API: /api/generate-cv (Tailored CV generator for any JD)
+  if (req.url === '/api/generate-cv' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', async () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const { default: handler } = await import('./api/generate-cv.js');
+        const fakeReq = { method: 'POST', body: payload, headers: req.headers };
+        const fakeRes = {
+          setHeader: (k, v) => res.setHeader(k, v),
+          status: (code) => {
+            res.statusCode = code;
+            return fakeRes;
+          },
+          json: (data) => {
+            res.writeHead(res.statusCode || 200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(data));
+          },
+          end: () => res.end()
+        };
+        await handler(fakeReq, fakeRes);
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // 4. Serve Static Files & Clean URLs
   let cleanUrl = req.url.split('?')[0];
-  if (cleanUrl === '/') cleanUrl = '/index.html';
+  if (cleanUrl === '/' || cleanUrl === '') cleanUrl = '/index.html';
+  if (cleanUrl === '/dcgen' || cleanUrl === '/cvgen' || cleanUrl === '/dcgen/' || cleanUrl === '/cvgen/') {
+    cleanUrl = '/dcgen.html';
+  }
   const localPath = path.join(__dirname, cleanUrl);
 
   fs.stat(localPath, (err, stats) => {

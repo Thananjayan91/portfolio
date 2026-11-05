@@ -59,22 +59,44 @@ In your [Vercel Project Dashboard](https://vercel.com):
 
 ---
 
+## 🎯 Tailored CV Generator Studio (`/dcgen` or `/cvgen`)
+
+A dedicated web studio at `https://your-domain.vercel.app/dcgen` (or `/cvgen`) allowing you to paste any Job Description (JD) and instantly generate an ATS-optimized, tailor-made CV:
+
+1. **Pure JSON RAG Architecture**:
+   - Queries the verified candidate vector store (`data/cv_index.json`).
+   - The LLM receives the JD, extracts key requirements, and returns a pure JSON object containing only dynamic tailor-made sections (target title, professional summary, categorized core skills, tailored Flipick experience bullets, build examples, and domain alignment).
+   - Fixed constants (Personal details, UCSC BIT & Moratuwa degrees, verified company timelines) are assembled deterministically on the client to eliminate hallucination.
+2. **True-to-Life A4 Layout**:
+   - Formatted identically to the executive Dispensed AI Builder template (`Thananjayan_Aruljothy_CV_Dispensed_AI_Builder.pdf`).
+3. **Download Options**:
+   - **Download PDF**: Direct 1-click client-side high-resolution PDF download using `html2pdf.js`.
+   - **Print PDF**: Native vector print stylesheet (`@media print` with `@page { size: A4; }`) for razor-sharp selectable text PDFs.
+   - **Edit Live**: In-browser inline editing (`contenteditable`) to tweak any bullet point or word before exporting.
+   - **Copy Markdown**: One-click ATS markdown copy for fast application forms.
+
+---
+
 ## 📁 Project Structure
 
 ```
 portfolio/
-├── index.html               # Main website markup & admin modal
-├── style.css                # Dark neural theme, animations & responsiveness
-├── index.js                 # Neural canvas, circuit interactivity & RAG client
-├── server.js                # Zero-dependency local dev server with direct disk write
-├── package.json             # ES Module configuration
-├── Thananjayan_hero.png     # Cutout portrait photo
+├── index.html                   # Main portfolio website
+├── dcgen.html                   # Tailored CV Generator Studio (/dcgen)
+├── dcgen.css                    # Studio styling & A4 print stylesheet
+├── dcgen.js                     # Tailored CV assembler, presets & PDF exporter
+├── style.css                    # Dark neural theme, animations & responsiveness
+├── index.js                     # Neural canvas, circuit interactivity & RAG client
+├── server.js                    # Zero-dependency local dev server with direct disk write
+├── package.json                 # ES Module configuration
+├── Thananjayan_hero.png         # Cutout portrait photo
 ├── Thananjayan_Aruljothy_CV.pdf # Master PDF Resume (Downloadable)
 ├── data/
-│   └── cv_index.json        # Permanent vector database (chunks + 1536-dim embeddings)
+│   └── cv_index.json            # Permanent vector database (chunks + 1536-dim embeddings)
 ├── api/
-│   ├── chat.js              # Vercel Serverless Function (Cosine similarity + GPT-4o-mini)
-│   └── index-cv.js          # Vercel Serverless Function (OpenAI text-embedding-3-small)
-├── vercel.json              # Vercel deployment configuration
-└── .env.example             # Environment variable template
+│   ├── chat.js                  # Vercel Serverless Function (Cosine similarity + GPT-4o-mini)
+│   ├── generate-cv.js           # Vercel Serverless Function (Tailored CV JSON Generator)
+│   └── index-cv.js              # Vercel Serverless Function (OpenAI text-embedding-3-small)
+├── vercel.json                  # Vercel deployment configuration & rewrites
+└── .env.example                 # Environment variable template
 ```

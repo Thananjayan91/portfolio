@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tailored CV Generator — Thananjayan Aruljothy</title>
+  <meta name="description" content="AI-powered Job Description CV Tailor and RAG Generator for Thananjayan Aruljothy. Generates ATS-optimized A4 resumes with 1-click PDF download." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- html2pdf.js for Client-Side High-Res Vector/A4 PDF generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="./dcgen.css" />
+</head>
+<body>
+
+  <!-- Top Studio Header -->
+  <header class="dcgen-header">
+    <div class="brand-wrap">
+      <a href="./index.html" class="brand-logo">
+        <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--primary-cyan);"></i>
+        <span>Thananjayan.ai</span>
+      </a>
+      <span class="brand-badge">RAG CV Tailor</span>
+    </div>
+
+    <div class="header-actions">
+      <a href="./index.html" class="btn-nav">
+        <i class="fa-solid fa-arrow-left"></i> Back to Portfolio
+      </a>
+    </div>
+  </header>
+
+  <!-- Studio Workspace -->
+  <main class="studio-layout">
+
+    <!-- Left Panel: Input & Settings -->
+    <aside class="left-panel">
+      <div class="panel-title-area">
+        <h2 class="panel-title">
+          <i class="fa-solid fa-file-invoice"></i> Tailor CV for any JD
+        </h2>
+        <p class="panel-desc">
+          Paste any Job Description. The RAG engine analyzes the role requirements, aligns verified candidate data, and returns pure structured JSON to assemble an ATS-optimized, high-impact CV.
+        </p>
+      </div>
+
+      <!-- Quick Preset Buttons -->
+      <div class="presets-group">
+        <span class="presets-label">Quick Test Presets:</span>
+        <div class="presets-pills">
+          <button type="button" class="preset-pill" data-preset="aiBuilder">✦ AI Builder / LLM Apps</button>
+          <button type="button" class="preset-pill" data-preset="fullstackAI">✦ Full-Stack AI Engineer</button>
+          <button type="button" class="preset-pill" data-preset="ragSpecialist">✦ RAG & Document Intelligence</button>
+        </div>
+      </div>
+
+      <!-- JD Form -->
+      <form id="jd-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="job-title-input" class="form-label">Target Role Title</label>
+            <input type="text" id="job-title-input" class="form-input" placeholder="e.g. AI Engineer / AI Builder" />
+          </div>
+          <div class="form-group">
+            <label for="company-input" class="form-label">Target Company</label>
+            <input type="text" id="company-input" class="form-input" placeholder="e.g. TechCorp (Optional)" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="jd-input" class="form-label">
+            <span>Job Description (JD)</span>
+            <span class="label-hint">Paste full JD text</span>
+          </label>
+          <textarea id="jd-input" class="form-textarea" placeholder="Paste the job responsibilities, tech stack, and qualifications here..."></textarea>
+        </div>
+
+        <!-- Optional API Key accordion for custom key override -->
+        <div class="api-key-accordion">
+          <div class="api-key-header" id="api-key-header">
+            <span><i class="fa-solid fa-key"></i> OpenAI API Key Override (Optional)</span>
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
+          <div class="api-key-body" id="api-key-body">
+            <input type="password" id="api-key-input" class="form-input" placeholder="sk-... (Leave empty to use Vercel env variable)" />
+            <p class="api-key-hint">On Vercel, the server's OPENAI_API_KEY is used automatically.</p>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" id="btn-generate" class="btn-generate">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+          <span>Generate Tailored CV</span>
+        </button>
+      </form>
+
+      <!-- Status Indicator -->
+      <div class="status-indicator" id="status-indicator">
+        <div class="status-row">
+          <div class="spinner"></div>
+          <span id="status-text">Analyzing JD keywords & querying CV vector store...</span>
+        </div>
+      </div>
+
+      <!-- Match Analytics Card -->
+      <div class="match-card" id="match-card">
+        <div class="match-header">
+          <div class="match-title">
+            <i class="fa-solid fa-bullseye" style="color: var(--accent-green);"></i>
+            <span>ATS Alignment Score</span>
+          </div>
+          <span class="match-score-badge" id="match-score">92% Match</span>
+        </div>
+        <div class="keywords-wrap" id="match-keywords">
+          <!-- Keyword Badges Populated Dynamically -->
+        </div>
+        <div class="pitch-box" id="match-pitch">
+          <!-- Outreach Hook Populated Dynamically -->
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- Right Panel: Live A4 Document Viewer -->
+    <section class="right-panel" id="right-panel">
+
+      <!-- Action Toolbar -->
+      <div class="cv-toolbar">
+        <div class="toolbar-left">
+          <div class="doc-status-pill">
+            <span class="dot-indicator"></span>
+            <span>A4 Document Preview (Dispensed AI Builder Layout)</span>
+          </div>
+        </div>
+
+        <div class="toolbar-actions">
+          <button type="button" class="btn-tool edit-toggle" id="btn-edit-toggle" title="Click to edit text directly on the CV">
+            <i class="fa-solid fa-pen-to-square"></i> Edit Live
+          </button>
+          <button type="button" class="btn-tool" id="btn-copy-md" title="Copy ATS-friendly Markdown">
+            <i class="fa-regular fa-copy"></i> Copy Markdown
+          </button>
+          <button type="button" class="btn-tool" id="btn-print-pdf" title="Native Vector Print-to-PDF">
+            <i class="fa-solid fa-print"></i> Print PDF
+          </button>
+          <button type="button" class="btn-tool primary-download" id="btn-download-pdf" title="1-Click Direct PDF Download">
+            <i class="fa-solid fa-download"></i> Download PDF
+          </button>
+        </div>
+      </div>
+
+      <!-- Canvas Area -->
+      <div class="doc-canvas-area">
+        <div class="edit-mode-banner" id="edit-banner">
+          <i class="fa-solid fa-circle-info"></i>
+          <span>Live Edit Mode Active: You can click and modify any line, bullet, or heading directly on the paper.</span>
+        </div>
+
+        <!-- A4 Document Paper Container -->
+        <article class="cv-paper" id="cv-paper" contenteditable="false">
+          <!-- Dynamic Content Rendered Here via dcgen.js -->
+        </article>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Script -->
+  <script src="./dcgen.js"></script>
+</body>
+</html>

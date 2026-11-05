@@ -2,6 +2,10 @@
   "version": 2,
   "cleanUrls": true,
   "trailingSlash": false,
+  "rewrites": [
+    { "source": "/dcgen", "destination": "/dcgen.html" },
+    { "source": "/cvgen", "destination": "/dcgen.html" }
+  ],
   "headers": [
     {
       "source": "/(.*)",
