@@ -386,26 +386,132 @@ async function handleGenerate(e) {
       }
     }, 1800);
 
-    const response = await fetch('/api/generate-cv', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        jobDescription: jd,
-        jobTitle: jobTitleInput?.value.trim() || '',
-        companyName: companyInput?.value.trim() || '',
-        apiKey: customKey
-      })
-    });
+    let resData = null;
 
-    if (!response.ok) {
-      const errJson = await response.json().catch(() => ({}));
-      throw new Error(errJson.error || errJson.details || `Generation failed (${response.status})`);
+    try {
+      const response = await fetch('/api/generate-cv', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          jobDescription: jd,
+          jobTitle: jobTitleInput?.value.trim() || '',
+          companyName: companyInput?.value.trim() || '',
+          apiKey: customKey
+        })
+      });
+
+      if (response.ok) {
+        resData = await response.json();
+      } else if (response.status === 404 || response.status === 405) {
+        console.warn('API endpoint not found (static server detected). Attempting browser-side fallback...');
+      } else {
+        const errJson = await response.json().catch(() => ({}));
+        throw new Error(errJson.error || errJson.details || `Generation failed (${response.status})`);
+      }
+    } catch (netErr) {
+      console.warn('Network call to /api/generate-cv failed, trying browser direct fallback:', netErr);
     }
 
-    const resData = await response.json();
-    if (!resData.data) {
+    // Direct Browser Fallback for VS Code Live Server
+    if (!resData || !resData.data) {
+      if (!customKey) {
+        throw new Error(
+          'Static dev server detected (e.g. Live Server). To test locally, either:\n' +
+          '1. Enter your OpenAI API Key in the field above, OR\n' +
+          '2. Run "node server.js" in terminal and open http://localhost:3000/dcgen'
+        );
+      }
+
+      statusText.textContent = 'Calling OpenAI API directly from browser...';
+
+      // Fetch active cv_index chunks
+      let cvContext = '';
+      try {
+        const cvRes = await fetch('./data/cv_index.json');
+        if (cvRes.ok) {
+          const cvJson = await cvRes.json();
+          cvContext = (cvJson.chunks || []).slice(0, 4).map(c => `[${c.title}]\n${c.text}`).join('\n\n');
+        }
+      } catch (e) {
+        console.warn('Could not load local cv_index.json:', e);
+      }
+
+      const clientPrompt = `You are an elite Tech Career Architect tailoring Thananjayan Aruljothy's CV for a specific Job Description.
+
+STRICT FACTUAL GUARDRAILS:
+1. Candidate: Thananjayan Aruljothy
+2. Primary Role: Flipick (April 2023 – Present), AI Full Stack Engineer / AI Developer (India — Remote).
+3. Cloud: Strictly AWS EC2 (Ubuntu/Linux, Gunicorn, Nginx reverse proxy). NEVER claim AWS Lambda or Kubernetes.
+4. AI Capabilities: Multi-LLM APIs (OpenAI, Claude, Gemini), RAG pipelines, Veo 3 / Kling video, Fabric.js canvas, ElevenLabs TTS, D-ID avatars, Python Flask backends.
+5. Salesforce: Trailhead Ranger with 10 Superbadges (self-directed learning, not commercial certification).
+6. Return ONLY a valid JSON object matching the requested schema.
+
+TARGET ROLE: ${jobTitleInput?.value.trim() || 'AI Full-Stack Engineer / AI Builder'}
+TARGET COMPANY: ${companyInput?.value.trim() || 'Target Company'}
+
+=== JOB DESCRIPTION ===
+${jd}
+
+=== RETRIEVED CANDIDATE CONTEXT ===
+${cvContext}
+
+Generate JSON matching this exact structure:
+{
+  "targetTitle": "Punchy Target Title (e.g. AI BUILDER | AI-POWERED APPS, AUTOMATIONS & PRODUCTION TOOLS)",
+  "summary": "Tailored 4-line professional summary addressing JD pain points.",
+  "coreSkills": [
+    { "category": "Domain", "skills": "Skills matching JD" }
+  ],
+  "tailoredFlipickExperience": [
+    "4-5 high impact bullet points matching JD requirements"
+  ],
+  "tailoredProjects": [
+    { "name": "AI-Powered Course Content Generation Platform", "subtitle": "Python / Flask / RAG / PPTX & SCORM", "bullets": ["1-2 bullets"] },
+    { "name": "AI Cinematic Video Generation & Editing Platform", "subtitle": "Google Veo 3 / Kling / In-App Video Editor", "bullets": ["1-2 bullets"] },
+    { "name": "AI RAG Knowledge Base & Document Intelligence", "subtitle": "Python / LLM / Vector Retrieval", "bullets": ["1-2 bullets"] }
+  ],
+  "additionalLearning": [
+    "Studying domain practices matching JD",
+    "Exploring formal AI evaluation frameworks",
+    "Salesforce platform development (Trailhead Ranger, 10 Superbadges completed) — Flow automation and process design"
+  ],
+  "matchAnalysis": {
+    "matchScore": 92,
+    "matchedKeywords": ["Keyword1", "Keyword2", "Keyword3"],
+    "keyStrengths": ["Strength 1", "Strength 2"],
+    "customPitch": "2-sentence outreach pitch"
+  }
+}`;
+
+      const openAiRes = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${customKey}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            { role: 'system', content: 'You are an expert resume architect. Return strictly valid JSON.' },
+            { role: 'user', content: clientPrompt }
+          ],
+          temperature: 0.3,
+          response_format: { type: 'json_object' }
+        })
+      });
+
+      if (!openAiRes.ok) {
+        const errJson = await openAiRes.json().catch(() => ({}));
+        throw new Error(errJson.error?.message || `OpenAI error (${openAiRes.status})`);
+      }
+
+      const openAiData = await openAiRes.json();
+      resData = { data: JSON.parse(openAiData.choices[0].message.content) };
+    }
+
+    if (!resData || !resData.data) {
       throw new Error('Invalid response structure received from generator');
     }
 
@@ -591,3 +697,4 @@ document.addEventListener('DOMContentLoaded', () => {
     apiBody?.classList.toggle('open');
   });
 });
+
