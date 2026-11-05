@@ -13,6 +13,8 @@ const CANDIDATE_CONSTANTS = {
     workPreference: "Remote",
     phone: "+94 77 844 9255",
     email: "thananjayan1991@yahoo.com",
+    portfolio: "portfolio-thananjayan.vercel.app",
+    portfolioUrl: "https://portfolio-thananjayan.vercel.app/",
     github: "github.com/Thananjayan91",
     githubUrl: "https://github.com/Thananjayan91",
     linkedin: "linkedin.com/in/thananjayan-aruljothy",
@@ -208,6 +210,7 @@ function renderCV() {
         ${c.contact.location} | ${c.contact.workPreference} | 
         <a href="tel:${c.contact.phone}">${c.contact.phone}</a> | 
         <a href="mailto:${c.contact.email}">${c.contact.email}</a> | 
+        Portfolio: <a href="${c.contact.portfolioUrl}" target="_blank" rel="noopener">${c.contact.portfolio}</a> | 
         GitHub: <a href="${c.contact.githubUrl}" target="_blank" rel="noopener">${c.contact.github}</a> | 
         LinkedIn: <a href="${c.contact.linkedinUrl}" target="_blank" rel="noopener">${c.contact.linkedin}</a> | 
         Trailhead: <a href="${c.contact.trailheadUrl}" target="_blank" rel="noopener">${c.contact.trailhead}</a>
@@ -581,7 +584,7 @@ function copyMarkdown() {
   const md = `# ${c.name}
 **${d.targetTitle}**
 ${c.contact.location} | ${c.contact.workPreference} | ${c.contact.phone} | ${c.contact.email}
-GitHub: https://${c.contact.github} | LinkedIn: https://${c.contact.linkedin} | Trailhead: https://${c.contact.trailhead}
+Portfolio: https://${c.contact.portfolio} | GitHub: https://${c.contact.github} | LinkedIn: https://${c.contact.linkedin} | Trailhead: https://${c.contact.trailhead}
 
 ---
 
