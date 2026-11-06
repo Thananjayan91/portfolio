@@ -70,7 +70,7 @@ const CANDIDATE_CONSTANTS = {
 let currentDocType = 'cv'; // 'cv' or 'cl'
 
 let activeCVData = {
-  targetTitle: "AI BUILDER | AI-POWERED APPS, AUTOMATIONS & PRODUCTION TOOLS",
+  targetTitle: "FULLSTACK AI ENGINEER | AI-POWERED SOLUTIONS & CLOUD ARCHITECTURE",
   targetCompany: "Target Company",
   summary: "Software engineer with 3+ years of experience independently building and shipping AI-powered applications and automation pipelines that saw real production use — including an end-to-end AI content generation platform (PDF upload, RAG, AI-generated content, automated output as PPTX/SCORM) and an AI video generation platform (concept to character-consistent video to final rendered output). Comfortable coding and deploying independently, working with prompting, retrieval-augmented generation (RAG), APIs, and structured data handling. Bring a genuine, repeated track record of taking an unclear problem and shipping a working AI-powered solution on my own.",
   coreSkills: [
@@ -220,7 +220,7 @@ function renderCV() {
     <!-- Header -->
     <header class="cv-header">
       <h1 class="cv-name">${c.name}</h1>
-      <div class="cv-target-title">${escapeHTML(data.targetTitle || 'AI FULL STACK ENGINEER | LLM & AUTOMATION BUILDER')}</div>
+      <div class="cv-target-title">${escapeHTML(data.targetTitle || 'FULLSTACK AI ENGINEER | AI-POWERED SOLUTIONS & CLOUD ARCHITECTURE')}</div>
       <div class="cv-contact-line">
         ${c.contact.location} | ${c.contact.workPreference} | 
         <a href="tel:${c.contact.phone}">${c.contact.phone}</a> | 
@@ -539,6 +539,13 @@ async function handleGenerate(e) {
 STRICT FACTUAL GUARDRAILS:
 1. Candidate: Thananjayan Aruljothy
 2. Primary Role: Flipick (April 2023 – Present), AI Full Stack Engineer / AI Developer (India — Remote).
+   STRICT TITLE RULE: Thananjayan has ~3+ years experience. DO NOT label him 'Senior Software Engineer' (SSE), 'Senior Developer', or 'Lead' in his title.
+   targetTitle MUST start with either:
+   - 'FULLSTACK AI ENGINEER' (if JD emphasizes LLMs, RAG, GenAI apps)
+   - 'PYTHON ENGINEER' or 'PYTHON BACKEND ENGINEER' (if JD emphasizes Python/Flask/APIs)
+   - 'FULLSTACK ENGINEER' (if JD emphasizes full-stack web applications)
+   - 'AI BUILDER' (if JD emphasizes hands-on shipping of AI tools)
+   followed by a matching domain subtitle (e.g. 'FULLSTACK AI ENGINEER | AI-POWERED SOLUTIONS & CLOUD ARCHITECTURE'). NEVER use 'SENIOR' or 'LEAD' in this title.
 3. Cloud: Strictly AWS EC2 (Ubuntu/Linux, Gunicorn, Nginx reverse proxy). NEVER claim AWS Lambda or Kubernetes.
 4. AI Capabilities: Multi-LLM APIs (OpenAI, Claude, Gemini), RAG pipelines, Veo 3 / Kling video, Fabric.js canvas, ElevenLabs TTS, D-ID avatars, Python Flask backends.
 5. Salesforce: Trailhead Ranger with 10 Superbadges (self-directed learning, not commercial certification).
@@ -555,7 +562,7 @@ ${cvContext}
 
 Generate JSON matching this exact structure:
 {
-  "targetTitle": "Punchy Target Title (e.g. AI BUILDER | AI-POWERED APPS, AUTOMATIONS & PRODUCTION TOOLS)",
+  "targetTitle": "Authentic title starting with FULLSTACK AI ENGINEER, PYTHON ENGINEER, FULLSTACK ENGINEER, or AI BUILDER + domain subtitle. NO 'SENIOR' or 'LEAD'.",
   "summary": "Tailored 4-line professional summary addressing JD pain points.",
   "coreSkills": [
     { "category": "Domain", "skills": "Skills matching JD" }

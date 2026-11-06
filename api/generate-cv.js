@@ -149,6 +149,12 @@ export default async function handler(req, res) {
 === STRICT FACTUAL GUARDRAILS (NEVER VIOLATE OR HALLUCINATE) ===
 1. Candidate: Thananjayan Aruljothy
 2. Primary Professional Role: Flipick (April 2023 – Present), AI Full Stack Engineer / AI Developer (India — Remote).
+   STRICT TITLE RULE: Thananjayan has ~3+ years of professional engineering experience. DO NOT label him "Senior Software Engineer" (SSE), "Senior Developer", or "Lead" in his title or headline. Even if the target JD is for a Senior role, his own headline (targetTitle) MUST authentically choose between:
+   - "FULLSTACK AI ENGINEER" (if the JD emphasizes LLMs, RAG, GenAI apps, AI agents)
+   - "PYTHON ENGINEER" or "PYTHON BACKEND ENGINEER" (if the JD emphasizes Python, Flask, REST APIs, microservices)
+   - "FULLSTACK ENGINEER" (if the JD emphasizes full-stack web application development)
+   - "AI BUILDER" (if the JD emphasizes hands-on shipping of AI tools and automations)
+   followed by a domain specialization matching the JD (e.g. "FULLSTACK AI ENGINEER | AI-POWERED SOLUTIONS & CLOUD ARCHITECTURE" or "PYTHON ENGINEER | RAG PIPELINES, REST APIS & BACKEND SYSTEMS").
 3. Previous Experience:
    - Eureka Innovations (Jan 2022 – Apr 2022): Associate Software Engineer (JavaScript, Three.js, EdTech features).
    - KoceanSoft (Apr 2022 – Nov 2022): Junior Web Developer (HTML, CSS, JS, WordPress, Firebase).
@@ -181,7 +187,7 @@ ${topContext}
 
 Generate a tailored JSON response with the following exact keys:
 {
-  "targetTitle": "Punchy ATS Target Title (e.g. AI BUILDER | AI-POWERED APPS, AUTOMATIONS & PRODUCTION TOOLS)",
+  "targetTitle": "Authentic professional title tailored to the JD. MUST start with either 'FULLSTACK AI ENGINEER', 'PYTHON ENGINEER', 'FULLSTACK ENGINEER', or 'AI BUILDER', followed by a domain subtitle matching the JD (e.g. 'FULLSTACK AI ENGINEER | AI-POWERED SOLUTIONS & CLOUD ARCHITECTURE' or 'PYTHON ENGINEER | RAG PIPELINES, REST APIS & BACKEND SYSTEMS'). NEVER use 'SENIOR' or 'LEAD' in this title.",
   "summary": "Compelling 4-5 line professional summary highlighting proven production AI builds, RAG, Python/Flask, and independent shipping track record tailored to solve this JD's problems.",
   "coreSkills": [
     { "category": "Primary Domain (e.g. AI-Powered Building)", "skills": "Specific skills & responsibilities matching JD" },
