@@ -176,8 +176,11 @@ export default async function handler(req, res) {
 3. Align keywords, technical terminology, and framing directly with the target JD to maximize ATS score and recruiter appeal, while keeping every single bullet point 100% grounded in Thananjayan's verified capabilities.
 4. "growingInto": Pick 2-3 genuine areas mentioned in the JD where Thananjayan can leverage his rapid learning ability (e.g. healthcare compliance, FinTech data governance, formal LLM evaluation frameworks, forward-deployed engineering).`;
 
-    const userPrompt = `TARGET ROLE / TITLE: ${jobTitle || 'AI Full-Stack Engineer / AI Builder'}
-TARGET COMPANY: ${companyName || 'Target Company'}
+    const targetRoleName = (jobTitle || '').trim() || 'Software Engineer';
+    const targetCompanyName = (companyName || '').trim() || 'Target Company';
+
+    const userPrompt = `TARGET ROLE / TITLE TO APPLY FOR: ${targetRoleName}
+TARGET COMPANY: ${targetCompanyName}
 
 === JOB DESCRIPTION ===
 ${jobDescription}
@@ -231,15 +234,15 @@ Generate a tailored JSON response with the following exact keys:
   ],
   "coverLetter": {
     "salutation": "Dear Hiring Team,",
-    "subject": "Application for [Target Title] at [Target Company]",
+    "subject": "RE: Application for ${targetRoleName}",
     "paragraphs": [
-      "I am writing to express my strong enthusiasm for the [Target Title] position at [Target Company]. With 3+ years of experience independently designing, building, and deploying production AI systems and Python/Flask microservices at Flipick, I bring a demonstrated track record of taking complex requirements and shipping functional, high-value AI solutions.",
-      "In reviewing your needs for [Target Company], I noted your emphasis on [key requirement from JD]. At Flipick, I engineered end-to-end RAG pipelines and integrated multiple leading LLM APIs (OpenAI, Anthropic Claude, Google Gemini), implementing prompt engineering, structured JSON validation, and retrieval accuracy optimizations.",
+      "I am writing to express my strong enthusiasm for the ${targetRoleName} position at ${targetCompanyName}. With 3+ years of experience independently designing, building, and deploying production AI systems and Python/Flask microservices at Flipick, I bring a demonstrated track record of taking complex requirements and shipping functional, high-value AI solutions.",
+      "In reviewing your needs for ${targetCompanyName}, I noted your emphasis on [key requirement from JD]. At Flipick, I engineered end-to-end RAG pipelines and integrated multiple leading LLM APIs (OpenAI, Anthropic Claude, Google Gemini), implementing prompt engineering, structured JSON validation, and retrieval accuracy optimizations.",
       "Beyond document intelligence, I developed an AI-powered course content generation engine (PDF to automated PPTX/SCORM layout) and an AI cinematic video creation platform with Google Veo 3 and Kling. All of these workflows were deployed and maintained on AWS EC2 with Gunicorn and Nginx reverse proxies, prioritizing uptime, speed, and real production utility over prototypes.",
       "My academic background includes a Bachelor of Information Technology (BIT) from the University of Colombo, UCSC, alongside Salesforce Trailhead Ranger recognition with 10 Superbadges, demonstrating my disciplined technical foundation and ability to master new platforms quickly.",
-      "I would welcome the opportunity to discuss how my hands-on AI building experience, backend engineering skills, and independent shipping mindset can help [Target Company] achieve its technical goals. Thank you for your time and consideration."
+      "I would welcome the opportunity to discuss how my hands-on AI building experience, backend engineering skills, and independent shipping mindset can help ${targetCompanyName} achieve its technical goals. Thank you for your time and consideration."
     ],
-    "signoff": "Sincerely,\nThananjayan Aruljothy\nAI Full-Stack Engineer"
+    "signoff": "Sincerely,\\nThananjayan Aruljothy\\nFullstack AI Engineer"
   },
   "matchAnalysis": {
     "matchScore": 88,

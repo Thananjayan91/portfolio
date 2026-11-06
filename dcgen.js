@@ -347,14 +347,25 @@ function renderCoverLetter() {
   const cl = data.coverLetter || {};
 
   const compInput = (document.getElementById('company-input')?.value || data.targetCompany || 'the Hiring Company').trim();
-  const roleInput = (document.getElementById('job-title-input')?.value || data.targetTitle || 'AI Full-Stack Engineer').trim();
+  const targetJobRole = (document.getElementById('job-title-input')?.value || 'Software Engineer').trim();
+  const candidateTitle = data.targetTitle || 'FULLSTACK AI ENGINEER | AI-POWERED SOLUTIONS & CLOUD ARCHITECTURE';
+  const candidateHeadline = candidateTitle.split('|')[0].trim();
   const todayStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+  // Ensure paragraph 1 explicitly and cleanly references the target role being applied for
+  let paragraphs = (cl.paragraphs && cl.paragraphs.length > 0) ? [...cl.paragraphs] : [];
+  if (paragraphs.length > 0) {
+    paragraphs[0] = paragraphs[0].replace(
+      /for the (?:FULLSTACK AI ENGINEER|AI BUILDER|PYTHON ENGINEER|FULLSTACK ENGINEER|AI Full-Stack Engineer|Senior Lead|\[Target Title\]) position at/i,
+      `for the ${targetJobRole} position at`
+    );
+  }
 
   paper.innerHTML = `
     <!-- Header -->
     <header class="cl-header">
       <h1 class="cl-name">${c.name}</h1>
-      <div class="cl-target-title">${escapeHTML(roleInput)}</div>
+      <div class="cl-target-title">${escapeHTML(candidateTitle)}</div>
       <div class="cl-contact-line">
         ${c.contact.location} | ${c.contact.workPreference} | 
         <a href="tel:${c.contact.phone}">${c.contact.phone}</a> | 
@@ -373,20 +384,20 @@ function renderCoverLetter() {
         <strong>Hiring Team / Recruitment Manager</strong><br />
         ${escapeHTML(compInput)}
       </div>
-      <div class="cl-subject">RE: Application for ${escapeHTML(roleInput)}</div>
+      <div class="cl-subject">RE: Application for ${escapeHTML(targetJobRole)}</div>
       <div class="cl-salutation">${escapeHTML(cl.salutation || 'Dear Hiring Team,')}</div>
     </div>
 
     <!-- Letter Body -->
     <div class="cl-body">
-      ${(cl.paragraphs || []).map(p => `<p class="cl-body-paragraph">${escapeHTML(p)}</p>`).join('')}
+      ${paragraphs.map(p => `<p class="cl-body-paragraph">${escapeHTML(p)}</p>`).join('')}
     </div>
 
     <!-- Formal Signoff -->
     <div class="cl-signoff">
       <p>Sincerely,</p>
       <p style="margin-top: 4pt; font-weight: 700; color: #0f172a;">${c.name}</p>
-      <p style="font-weight: 400; font-size: 8.5pt; color: #475569;">${escapeHTML(roleInput)}</p>
+      <p style="font-weight: 400; font-size: 8.5pt; color: #475569;">${escapeHTML(candidateHeadline)}</p>
     </div>
   `;
 }
@@ -693,10 +704,21 @@ function copyMarkdown() {
   if (currentDocType === 'cl') {
     const cl = d.coverLetter || {};
     const compInput = (document.getElementById('company-input')?.value || d.targetCompany || 'the Hiring Company').trim();
-    const roleInput = (document.getElementById('job-title-input')?.value || d.targetTitle || 'AI Full-Stack Engineer').trim();
+    const targetJobRole = (document.getElementById('job-title-input')?.value || 'Software Engineer').trim();
+    const candidateTitle = d.targetTitle || 'FULLSTACK AI ENGINEER | AI-POWERED SOLUTIONS & CLOUD ARCHITECTURE';
+    const candidateHeadline = candidateTitle.split('|')[0].trim();
     const todayStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
+    let paragraphs = (cl.paragraphs && cl.paragraphs.length > 0) ? [...cl.paragraphs] : [];
+    if (paragraphs.length > 0) {
+      paragraphs[0] = paragraphs[0].replace(
+        /for the (?:FULLSTACK AI ENGINEER|AI BUILDER|PYTHON ENGINEER|FULLSTACK ENGINEER|AI Full-Stack Engineer|Senior Lead|\[Target Title\]) position at/i,
+        `for the ${targetJobRole} position at`
+      );
+    }
+
     const clText = `${c.name}
+${candidateTitle}
 ${c.contact.location} | ${c.contact.phone} | ${c.contact.email}
 Portfolio: ${c.contact.portfolioUrl} | GitHub: https://${c.contact.github} | LinkedIn: https://${c.contact.linkedin}
 
@@ -705,15 +727,15 @@ ${todayStr}
 To: Hiring Team / Recruitment Manager
 ${compInput}
 
-RE: Application for ${roleInput}
+RE: Application for ${targetJobRole}
 
 ${cl.salutation || 'Dear Hiring Team,'}
 
-${(cl.paragraphs || []).join('\n\n')}
+${paragraphs.join('\n\n')}
 
 Sincerely,
 ${c.name}
-${roleInput}
+${candidateHeadline}
 `;
     navigator.clipboard.writeText(clText).then(() => {
       alert('Cover Letter copied to clipboard!');
