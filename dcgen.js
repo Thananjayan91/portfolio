@@ -667,8 +667,34 @@ function downloadPDF() {
     const wasEditable = targetElement.getAttribute('contenteditable') === 'true';
     if (wasEditable) targetElement.setAttribute('contenteditable', 'false');
 
-    // Add export class to strip outer shadows and enforce exact 210mm A4 dimensions
-    targetElement.classList.add('exporting-pdf');
+    // Create an unconstrained export wrapper directly on body
+    // This isolates rendering from parent containers (.right-panel scrollbars, .left-panel offsets)
+    const exportWrapper = document.createElement('div');
+    exportWrapper.id = 'pdf-export-wrapper';
+    exportWrapper.style.position = 'fixed';
+    exportWrapper.style.top = '0';
+    exportWrapper.style.left = '0';
+    exportWrapper.style.width = '210mm';
+    exportWrapper.style.background = '#ffffff';
+    exportWrapper.style.zIndex = '9999999';
+    exportWrapper.style.margin = '0';
+    exportWrapper.style.padding = '0';
+    exportWrapper.style.overflow = 'visible';
+
+    const clone = targetElement.cloneNode(true);
+    clone.setAttribute('contenteditable', 'false');
+    clone.style.width = '210mm';
+    clone.style.minWidth = '210mm';
+    clone.style.maxWidth = '210mm';
+    clone.style.margin = '0';
+    clone.style.boxShadow = 'none';
+    clone.style.borderRadius = '0';
+    clone.style.display = 'block';
+    clone.style.background = '#ffffff';
+    clone.style.transform = 'none';
+
+    exportWrapper.appendChild(clone);
+    document.body.appendChild(exportWrapper);
 
     const opt = {
       margin: [10, 10, 10, 10],
@@ -686,11 +712,11 @@ function downloadPDF() {
       }
     };
 
-    html2pdf().set(opt).from(targetElement).save().then(() => {
-      targetElement.classList.remove('exporting-pdf');
+    html2pdf().set(opt).from(clone).save().then(() => {
+      exportWrapper.remove();
       if (wasEditable) targetElement.setAttribute('contenteditable', 'true');
     }).catch(err => {
-      targetElement.classList.remove('exporting-pdf');
+      exportWrapper.remove();
       if (wasEditable) targetElement.setAttribute('contenteditable', 'true');
       console.error('PDF export error:', err);
     });
