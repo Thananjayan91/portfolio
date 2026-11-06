@@ -667,11 +667,21 @@ function downloadPDF() {
     const wasEditable = targetElement.getAttribute('contenteditable') === 'true';
     if (wasEditable) targetElement.setAttribute('contenteditable', 'false');
 
+    // Add export class to strip outer shadows and enforce exact 210mm A4 dimensions
+    targetElement.classList.add('exporting-pdf');
+
     const opt = {
-      margin: [10, 12, 10, 12],
+      margin: 0,
       filename: filename,
       image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true, logging: false },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        scrollX: 0,
+        scrollY: 0,
+        windowWidth: 1200
+      },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
       pagebreak: {
         mode: ['avoid-all', 'css', 'legacy'],
@@ -680,7 +690,12 @@ function downloadPDF() {
     };
 
     html2pdf().set(opt).from(targetElement).save().then(() => {
+      targetElement.classList.remove('exporting-pdf');
       if (wasEditable) targetElement.setAttribute('contenteditable', 'true');
+    }).catch(err => {
+      targetElement.classList.remove('exporting-pdf');
+      if (wasEditable) targetElement.setAttribute('contenteditable', 'true');
+      console.error('PDF export error:', err);
     });
   } else {
     // Fallback: trigger native browser print
