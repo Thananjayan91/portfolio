@@ -453,6 +453,42 @@ body {
   gap: 0.6rem;
 }
 
+/* Page Mode Switcher */
+.page-mode-toggle {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+  gap: 2px;
+}
+
+.btn-mode {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.btn-mode:hover {
+  color: #fff;
+}
+
+.btn-mode.active {
+  background: linear-gradient(135deg, #0284c7, #2563eb);
+  color: #fff;
+  box-shadow: 0 1px 8px rgba(37, 99, 235, 0.45);
+}
+
 .doc-status-pill {
   font-size: 0.75rem;
   color: var(--text-secondary);
@@ -546,14 +582,12 @@ body {
   min-height: 297mm;
   background: #ffffff;
   color: #111827;
-  padding: 14mm 16mm 14mm 16mm;
   box-shadow: 0 15px 45px rgba(0, 0, 0, 0.6), 0 2px 8px rgba(0, 0, 0, 0.4);
   border-radius: 2px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  line-height: 1.42;
-  font-size: 9.5pt;
   position: relative;
   transition: transform 0.2s ease;
+  box-sizing: border-box;
 }
 
 /* Editable outline highlight */
@@ -562,9 +596,182 @@ body {
   outline-offset: 4px;
 }
 
-/* CV Header */
-.cv-name {
-  font-family: inherit;
+/* Page Break Divider (Used in 2-page mode) */
+.cv-page-break {
+  display: none;
+}
+
+/* -------------------------------------------------------------
+   MODE 1: SINGLE-PAGE COMPACT (ATS Gold Standard - Recommended)
+   Calibrated to fit precisely onto 1 single A4 page with zero cuts
+   ------------------------------------------------------------- */
+.cv-paper.single-page {
+  padding: 7mm 12mm 6mm 12mm;
+  font-size: 8.2pt;
+  line-height: 1.32;
+}
+
+.cv-paper.single-page .cv-name {
+  font-size: 16.5pt;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #0f172a;
+  text-transform: uppercase;
+  line-height: 1.12;
+  margin-bottom: 2pt;
+}
+
+.cv-paper.single-page .cv-target-title {
+  font-size: 8.8pt;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #1e293b;
+  text-transform: uppercase;
+  margin-bottom: 3.5pt;
+}
+
+.cv-paper.single-page .cv-contact-line {
+  font-size: 7.3pt;
+  color: #334155;
+  line-height: 1.35;
+  margin-bottom: 7pt;
+  word-break: break-word;
+}
+
+.cv-paper.single-page .cv-contact-line a {
+  color: #0284c7;
+  text-decoration: underline;
+}
+
+.cv-paper.single-page .cv-section {
+  margin-bottom: 5.5pt;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+.cv-paper.single-page .cv-section-title {
+  font-size: 8.7pt;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #0f172a;
+  text-transform: uppercase;
+  border-bottom: 1.1pt solid #0f172a;
+  padding-bottom: 1.5pt;
+  margin-bottom: 3.5pt;
+}
+
+.cv-paper.single-page .cv-summary-text {
+  font-size: 8.1pt;
+  color: #1e293b;
+  line-height: 1.33;
+  text-align: justify;
+}
+
+.cv-paper.single-page .cv-skill-line {
+  font-size: 8pt;
+  line-height: 1.28;
+  margin-bottom: 2pt;
+  color: #1e293b;
+}
+
+.cv-paper.single-page .cv-skill-category {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.cv-paper.single-page .cv-job-entry {
+  margin-bottom: 4.5pt;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+.cv-paper.single-page .cv-job-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 8.2pt;
+  margin-bottom: 1.5pt;
+}
+
+.cv-paper.single-page .cv-job-role-company {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.cv-paper.single-page .cv-job-meta {
+  font-size: 7.8pt;
+  color: #475569;
+  font-style: italic;
+}
+
+.cv-paper.single-page .cv-bullet-list {
+  list-style-type: disc;
+  margin-left: 13pt;
+  margin-bottom: 2pt;
+}
+
+.cv-paper.single-page .cv-bullet-list li {
+  font-size: 7.9pt;
+  color: #1e293b;
+  line-height: 1.3;
+  margin-bottom: 1.2pt;
+}
+
+.cv-paper.single-page .cv-project-entry {
+  margin-bottom: 3.8pt;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+.cv-paper.single-page .cv-project-title {
+  font-weight: 700;
+  font-size: 8.2pt;
+  color: #0f172a;
+  margin-bottom: 1pt;
+}
+
+.cv-paper.single-page .cv-project-tech {
+  font-weight: 400;
+  font-size: 7.8pt;
+  color: #475569;
+}
+
+.cv-paper.single-page .cv-edu-item {
+  font-size: 8pt;
+  line-height: 1.3;
+  color: #1e293b;
+  margin-bottom: 1.5pt;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+.cv-paper.single-page .cv-edu-degree {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.cv-paper.single-page .cv-edu-inst {
+  color: #334155;
+}
+
+.cv-paper.single-page .cv-edu-years {
+  color: #475569;
+}
+
+.cv-paper.single-page .cv-page-break {
+  display: none !important;
+}
+
+/* -------------------------------------------------------------
+   MODE 2: TWO-PAGE DETAILED (Generous spacing & clean page break)
+   ------------------------------------------------------------- */
+.cv-paper.two-page {
+  padding: 12mm 15mm 12mm 15mm;
+  font-size: 9.2pt;
+  line-height: 1.42;
+}
+
+.cv-paper.two-page .cv-name {
   font-size: 19pt;
   font-weight: 800;
   letter-spacing: 0.02em;
@@ -574,7 +781,7 @@ body {
   margin-bottom: 3pt;
 }
 
-.cv-target-title {
+.cv-paper.two-page .cv-target-title {
   font-size: 9.8pt;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -583,7 +790,7 @@ body {
   margin-bottom: 5pt;
 }
 
-.cv-contact-line {
+.cv-paper.two-page .cv-contact-line {
   font-size: 8pt;
   color: #334155;
   line-height: 1.4;
@@ -591,17 +798,18 @@ body {
   word-break: break-word;
 }
 
-.cv-contact-line a {
+.cv-paper.two-page .cv-contact-line a {
   color: #0284c7;
   text-decoration: underline;
 }
 
-/* CV Sections */
-.cv-section {
-  margin-bottom: 10pt;
+.cv-paper.two-page .cv-section {
+  margin-bottom: 9pt;
+  page-break-inside: avoid;
+  break-inside: avoid;
 }
 
-.cv-section-title {
+.cv-paper.two-page .cv-section-title {
   font-size: 9.5pt;
   font-weight: 800;
   letter-spacing: 0.05em;
@@ -612,32 +820,32 @@ body {
   margin-bottom: 5.5pt;
 }
 
-.cv-summary-text {
+.cv-paper.two-page .cv-summary-text {
   font-size: 9pt;
   color: #1e293b;
   line-height: 1.45;
   text-align: justify;
 }
 
-/* Core Skills Table / Lines */
-.cv-skill-line {
+.cv-paper.two-page .cv-skill-line {
   font-size: 8.8pt;
   line-height: 1.4;
   margin-bottom: 3.5pt;
   color: #1e293b;
 }
 
-.cv-skill-category {
+.cv-paper.two-page .cv-skill-category {
   font-weight: 700;
   color: #0f172a;
 }
 
-/* Experience & Job Entries */
-.cv-job-entry {
-  margin-bottom: 8pt;
+.cv-paper.two-page .cv-job-entry {
+  margin-bottom: 7.5pt;
+  page-break-inside: avoid;
+  break-inside: avoid;
 }
 
-.cv-job-header {
+.cv-paper.two-page .cv-job-header {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
@@ -645,67 +853,92 @@ body {
   margin-bottom: 2.5pt;
 }
 
-.cv-job-role-company {
+.cv-paper.two-page .cv-job-role-company {
   font-weight: 700;
   color: #0f172a;
 }
 
-.cv-job-meta {
+.cv-paper.two-page .cv-job-meta {
   font-size: 8.5pt;
   color: #475569;
   font-style: italic;
 }
 
-.cv-bullet-list {
+.cv-paper.two-page .cv-bullet-list {
   list-style-type: disc;
   margin-left: 15pt;
   margin-bottom: 4pt;
 }
 
-.cv-bullet-list li {
+.cv-paper.two-page .cv-bullet-list li {
   font-size: 8.8pt;
   color: #1e293b;
   line-height: 1.4;
   margin-bottom: 2.5pt;
 }
 
-/* Build Examples / Projects */
-.cv-project-entry {
+.cv-paper.two-page .cv-project-entry {
   margin-bottom: 6pt;
+  page-break-inside: avoid;
+  break-inside: avoid;
 }
 
-.cv-project-title {
+.cv-paper.two-page .cv-project-title {
   font-weight: 700;
   font-size: 9pt;
   color: #0f172a;
   margin-bottom: 1.5pt;
 }
 
-.cv-project-tech {
+.cv-paper.two-page .cv-project-tech {
   font-weight: 400;
   font-size: 8.5pt;
   color: #475569;
 }
 
-/* Education & Additional Learning */
-.cv-edu-item {
+.cv-paper.two-page .cv-edu-item {
   font-size: 8.8pt;
   line-height: 1.4;
   color: #1e293b;
   margin-bottom: 2.5pt;
+  page-break-inside: avoid;
+  break-inside: avoid;
 }
 
-.cv-edu-degree {
+.cv-paper.two-page .cv-edu-degree {
   font-weight: 700;
   color: #0f172a;
 }
 
-.cv-edu-inst {
+.cv-paper.two-page .cv-edu-inst {
   color: #334155;
 }
 
-.cv-edu-years {
+.cv-paper.two-page .cv-edu-years {
   color: #475569;
+}
+
+.cv-paper.two-page .cv-page-break {
+  display: block;
+  page-break-before: always;
+  break-before: page;
+  height: 1px;
+  margin: 16mm 0 10mm 0;
+  border-top: 1px dashed #94a3b8;
+  position: relative;
+}
+
+.cv-paper.two-page .cv-page-break::after {
+  content: '✂ PAGE BREAK (Page 2 Starts Here)';
+  position: absolute;
+  top: -9px;
+  right: 0;
+  background: #ffffff;
+  color: #64748b;
+  font-size: 7pt;
+  padding: 0 6px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
 }
 
 /* ===================================================================
@@ -714,7 +947,7 @@ body {
    =================================================================== */
 @page {
   size: A4 portrait;
-  margin: 12mm 14mm 12mm 14mm;
+  margin: 8mm 10mm 8mm 10mm;
 }
 
 @media print {
@@ -748,6 +981,31 @@ body {
 
   .cv-paper {
     width: 100% !important;
+    min-height: auto !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+  }
+
+  .cv-page-break {
+    border-top: none !important;
+    margin: 0 !important;
+    height: 0 !important;
+  }
+
+  .cv-page-break::after {
+    display: none !important;
+  }
+
+  .cv-section,
+  .cv-job-entry,
+  .cv-project-entry,
+  .cv-edu-item {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+}
     min-height: auto !important;
     box-shadow: none !important;
     padding: 0 !important;

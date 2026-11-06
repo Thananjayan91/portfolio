@@ -67,6 +67,8 @@ const CANDIDATE_CONSTANTS = {
 };
 
 // === 2. INITIAL BASELINE (Matches Dispensed AI Builder CV format) ===
+let currentLayoutMode = '1page'; // '1page' (ATS Gold Standard) or '2page'
+
 let activeCVData = {
   targetTitle: "AI BUILDER | AI-POWERED APPS, AUTOMATIONS & PRODUCTION TOOLS",
   summary: "Software engineer with 3+ years of experience independently building and shipping AI-powered applications and automation pipelines that saw real production use — including an end-to-end AI content generation platform (PDF upload, RAG, AI-generated content, automated output as PPTX/SCORM) and an AI video generation platform (concept to character-consistent video to final rendered output). Comfortable coding and deploying independently, working with prompting, retrieval-augmented generation (RAG), APIs, and structured data handling. Bring a genuine, repeated track record of taking an unclear problem and shipping a working AI-powered solution on my own.",
@@ -198,6 +200,8 @@ function renderCV() {
   const paper = document.getElementById('cv-paper');
   if (!paper) return;
 
+  paper.className = `cv-paper ${currentLayoutMode === '1page' ? 'single-page' : 'two-page'}`;
+
   const c = CANDIDATE_CONSTANTS;
   const data = activeCVData;
 
@@ -286,8 +290,11 @@ function renderCV() {
       </div>
     </section>
 
+    <!-- Dedicated Page Break for 2-Page Mode -->
+    <div class="cv-page-break"></div>
+
     <!-- Selected Build Examples / Key Projects -->
-    <section class="cv-section">
+    <section class="cv-section section-projects">
       <h2 class="cv-section-title">Selected Build Examples</h2>
       ${(data.tailoredProjects || []).map(p => `
         <div class="cv-project-entry">
@@ -554,19 +561,37 @@ function downloadPDF() {
   const roleName = (activeCVData.targetTitle || 'AI_Builder')
     .replace(/[^a-zA-Z0-9]/g, '_')
     .slice(0, 30);
-  const filename = `Thananjayan_Aruljothy_CV_${roleName}.pdf`;
+  const modeSuffix = currentLayoutMode === '1page' ? '1Page' : '2Page';
+  const filename = `Thananjayan_Aruljothy_CV_${roleName}_${modeSuffix}.pdf`;
 
   // Use html2pdf.js if available
   if (typeof html2pdf !== 'undefined') {
+    const wasEditable = paper.getAttribute('contenteditable') === 'true';
+    if (wasEditable) paper.setAttribute('contenteditable', 'false');
+
     const opt = {
-      margin: [10, 12, 10, 12],
+      margin: 0, // 0 margin to prevent double-padding & artificial page splitting
       filename: filename,
       image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true, logging: false },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        letterRendering: true,
+        logging: false,
+        scrollY: 0,
+        scrollX: 0
+      },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: {
+        mode: ['avoid-all', 'css', 'legacy'],
+        before: '.cv-page-break',
+        avoid: ['.cv-section', '.cv-job-entry', '.cv-project-entry', '.cv-edu-item']
+      }
     };
 
-    html2pdf().set(opt).from(paper).save();
+    html2pdf().set(opt).from(paper).save().then(() => {
+      if (wasEditable) paper.setAttribute('contenteditable', 'true');
+    });
   } else {
     // Fallback: trigger native browser print
     window.print();
@@ -673,6 +698,24 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-print-pdf')?.addEventListener('click', printVectorPDF);
   document.getElementById('btn-copy-md')?.addEventListener('click', copyMarkdown);
   document.getElementById('btn-edit-toggle')?.addEventListener('click', toggleEditMode);
+
+  // Layout mode switcher (1-Page ATS vs 2-Page Detailed)
+  const btn1Page = document.getElementById('btn-mode-1page');
+  const btn2Page = document.getElementById('btn-mode-2page');
+
+  btn1Page?.addEventListener('click', () => {
+    currentLayoutMode = '1page';
+    btn1Page.classList.add('active');
+    btn2Page?.classList.remove('active');
+    renderCV();
+  });
+
+  btn2Page?.addEventListener('click', () => {
+    currentLayoutMode = '2page';
+    btn2Page.classList.add('active');
+    btn1Page?.classList.remove('active');
+    renderCV();
+  });
 
   // Presets listeners
   document.querySelectorAll('.preset-pill').forEach(pill => {
