@@ -832,20 +832,16 @@ body {
     page-break-after: auto;
   }
 
-  .cv-section {
+  .cv-section,
+  .cv-job-entry,
+  .cv-project-entry,
+  .cv-edu-item,
+  .cl-header,
+  .cl-meta-block,
+  .cl-body-paragraph,
+  .cl-signoff {
     page-break-inside: avoid;
-  }
-
-  .cv-job-entry {
-    page-break-inside: avoid;
-  }
-
-  .cv-project-entry {
-    page-break-inside: avoid;
-  }
-
-  .cv-edu-item {
-    page-break-inside: avoid;
+    break-inside: avoid;
   }
 
   .cl-paper {

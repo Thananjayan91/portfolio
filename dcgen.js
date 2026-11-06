@@ -660,73 +660,22 @@ function downloadPDF() {
   const targetElement = isCoverLetter ? document.getElementById('cl-paper') : document.getElementById('cv-paper');
   if (!targetElement) return;
 
-  const filename = getDownloadFilename(isCoverLetter ? 'Cover_Letter' : 'CV');
+  const rawFilename = getDownloadFilename(isCoverLetter ? 'Cover_Letter' : 'CV');
+  const filenameWithoutExt = rawFilename.replace(/\.pdf$/i, '');
 
-  // Use html2pdf.js if available
-  if (typeof html2pdf !== 'undefined') {
-    const wasEditable = targetElement.getAttribute('contenteditable') === 'true';
-    if (wasEditable) targetElement.setAttribute('contenteditable', 'false');
+  // Temporarily set document.title so browser print "Save as PDF" pre-fills the exact tailored filename!
+  const originalTitle = document.title;
+  document.title = filenameWithoutExt;
 
-    // Create an unconstrained export wrapper directly on body
-    // This isolates rendering from parent containers (.right-panel scrollbars, .left-panel offsets)
-    const exportWrapper = document.createElement('div');
-    exportWrapper.id = 'pdf-export-wrapper';
-    exportWrapper.style.position = 'fixed';
-    exportWrapper.style.top = '0';
-    exportWrapper.style.left = '0';
-    exportWrapper.style.width = '210mm';
-    exportWrapper.style.background = '#ffffff';
-    exportWrapper.style.zIndex = '9999999';
-    exportWrapper.style.margin = '0';
-    exportWrapper.style.padding = '0';
-    exportWrapper.style.overflow = 'visible';
+  const restoreTitle = () => {
+    document.title = originalTitle;
+    window.removeEventListener('afterprint', restoreTitle);
+  };
 
-    const clone = targetElement.cloneNode(true);
-    clone.setAttribute('contenteditable', 'false');
-    clone.style.width = '210mm';
-    clone.style.minWidth = '210mm';
-    clone.style.maxWidth = '210mm';
-    clone.style.margin = '0';
-    clone.style.boxShadow = 'none';
-    clone.style.borderRadius = '0';
-    clone.style.display = 'block';
-    clone.style.background = '#ffffff';
-    clone.style.transform = 'none';
+  window.addEventListener('afterprint', restoreTitle);
+  setTimeout(restoreTitle, 4000);
 
-    exportWrapper.appendChild(clone);
-    document.body.appendChild(exportWrapper);
-
-    const opt = {
-      margin: [10, 10, 10, 10],
-      filename: filename,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: {
-        scale: 2,
-        useCORS: true,
-        logging: false
-      },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-      pagebreak: {
-        mode: ['avoid-all', 'css', 'legacy'],
-        avoid: ['.cv-section', '.cv-job-entry', '.cv-project-entry', '.cv-edu-item', '.cl-header', '.cl-meta-block', '.cl-body-paragraph', '.cl-signoff']
-      }
-    };
-
-    html2pdf().set(opt).from(clone).save().then(() => {
-      exportWrapper.remove();
-      if (wasEditable) targetElement.setAttribute('contenteditable', 'true');
-    }).catch(err => {
-      exportWrapper.remove();
-      if (wasEditable) targetElement.setAttribute('contenteditable', 'true');
-      console.error('PDF export error:', err);
-    });
-  } else {
-    // Fallback: trigger native browser print
-    window.print();
-  }
-}
-
-function printVectorPDF() {
+  // Trigger high-definition native ATS Vector PDF engine (perfect margins, crisp vector fonts, clickable links)
   window.print();
 }
 
@@ -870,7 +819,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Attach toolbar listeners
   document.getElementById('btn-download-pdf')?.addEventListener('click', downloadPDF);
-  document.getElementById('btn-print-pdf')?.addEventListener('click', printVectorPDF);
   document.getElementById('btn-copy-md')?.addEventListener('click', copyMarkdown);
   document.getElementById('btn-edit-toggle')?.addEventListener('click', toggleEditMode);
 
