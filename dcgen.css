@@ -314,6 +314,22 @@ body {
   background: linear-gradient(135deg, #0ea5e9, #4f46e5);
 }
 
+.form-btn-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.btn-cover-letter {
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35) !important;
+}
+
+.btn-cover-letter:hover:not(:disabled) {
+  background: linear-gradient(135deg, #059669, #047857) !important;
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5) !important;
+}
+
 .btn-generate:disabled {
   opacity: 0.6;
   cursor: not-allowed;
@@ -453,21 +469,21 @@ body {
   gap: 0.6rem;
 }
 
-/* Page Mode Switcher */
-.page-mode-toggle {
+/* Document Type Tab Toggle */
+.doc-tab-toggle {
   display: inline-flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid var(--border-subtle);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: var(--radius-sm);
-  padding: 2px;
-  gap: 2px;
+  padding: 3px;
+  gap: 3px;
 }
 
-.btn-mode {
-  padding: 0.35rem 0.75rem;
-  font-size: 0.78rem;
-  font-weight: 600;
+.btn-tab {
+  padding: 0.38rem 0.85rem;
+  font-size: 0.82rem;
+  font-weight: 700;
   border: none;
   background: transparent;
   color: var(--text-secondary);
@@ -476,17 +492,17 @@ body {
   transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.45rem;
 }
 
-.btn-mode:hover {
+.btn-tab:hover {
   color: #fff;
 }
 
-.btn-mode.active {
-  background: linear-gradient(135deg, #0284c7, #2563eb);
+.btn-tab.active {
+  background: linear-gradient(135deg, #0284c7, #6366f1);
   color: #fff;
-  box-shadow: 0 1px 8px rgba(37, 99, 235, 0.45);
+  box-shadow: 0 2px 10px rgba(99, 102, 241, 0.4);
 }
 
 .doc-status-pill {
@@ -582,12 +598,14 @@ body {
   min-height: 297mm;
   background: #ffffff;
   color: #111827;
+  padding: 14mm 16mm 14mm 16mm;
   box-shadow: 0 15px 45px rgba(0, 0, 0, 0.6), 0 2px 8px rgba(0, 0, 0, 0.4);
   border-radius: 2px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.42;
+  font-size: 9.5pt;
   position: relative;
   transition: transform 0.2s ease;
-  box-sizing: border-box;
 }
 
 /* Editable outline highlight */
@@ -596,182 +614,9 @@ body {
   outline-offset: 4px;
 }
 
-/* Page Break Divider (Used in 2-page mode) */
-.cv-page-break {
-  display: none;
-}
-
-/* -------------------------------------------------------------
-   MODE 1: SINGLE-PAGE COMPACT (ATS Gold Standard - Recommended)
-   Calibrated to fit precisely onto 1 single A4 page with zero cuts
-   ------------------------------------------------------------- */
-.cv-paper.single-page {
-  padding: 7mm 12mm 6mm 12mm;
-  font-size: 8.2pt;
-  line-height: 1.32;
-}
-
-.cv-paper.single-page .cv-name {
-  font-size: 16.5pt;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  color: #0f172a;
-  text-transform: uppercase;
-  line-height: 1.12;
-  margin-bottom: 2pt;
-}
-
-.cv-paper.single-page .cv-target-title {
-  font-size: 8.8pt;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  color: #1e293b;
-  text-transform: uppercase;
-  margin-bottom: 3.5pt;
-}
-
-.cv-paper.single-page .cv-contact-line {
-  font-size: 7.3pt;
-  color: #334155;
-  line-height: 1.35;
-  margin-bottom: 7pt;
-  word-break: break-word;
-}
-
-.cv-paper.single-page .cv-contact-line a {
-  color: #0284c7;
-  text-decoration: underline;
-}
-
-.cv-paper.single-page .cv-section {
-  margin-bottom: 5.5pt;
-  page-break-inside: avoid;
-  break-inside: avoid;
-}
-
-.cv-paper.single-page .cv-section-title {
-  font-size: 8.7pt;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  color: #0f172a;
-  text-transform: uppercase;
-  border-bottom: 1.1pt solid #0f172a;
-  padding-bottom: 1.5pt;
-  margin-bottom: 3.5pt;
-}
-
-.cv-paper.single-page .cv-summary-text {
-  font-size: 8.1pt;
-  color: #1e293b;
-  line-height: 1.33;
-  text-align: justify;
-}
-
-.cv-paper.single-page .cv-skill-line {
-  font-size: 8pt;
-  line-height: 1.28;
-  margin-bottom: 2pt;
-  color: #1e293b;
-}
-
-.cv-paper.single-page .cv-skill-category {
-  font-weight: 700;
-  color: #0f172a;
-}
-
-.cv-paper.single-page .cv-job-entry {
-  margin-bottom: 4.5pt;
-  page-break-inside: avoid;
-  break-inside: avoid;
-}
-
-.cv-paper.single-page .cv-job-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  font-size: 8.2pt;
-  margin-bottom: 1.5pt;
-}
-
-.cv-paper.single-page .cv-job-role-company {
-  font-weight: 700;
-  color: #0f172a;
-}
-
-.cv-paper.single-page .cv-job-meta {
-  font-size: 7.8pt;
-  color: #475569;
-  font-style: italic;
-}
-
-.cv-paper.single-page .cv-bullet-list {
-  list-style-type: disc;
-  margin-left: 13pt;
-  margin-bottom: 2pt;
-}
-
-.cv-paper.single-page .cv-bullet-list li {
-  font-size: 7.9pt;
-  color: #1e293b;
-  line-height: 1.3;
-  margin-bottom: 1.2pt;
-}
-
-.cv-paper.single-page .cv-project-entry {
-  margin-bottom: 3.8pt;
-  page-break-inside: avoid;
-  break-inside: avoid;
-}
-
-.cv-paper.single-page .cv-project-title {
-  font-weight: 700;
-  font-size: 8.2pt;
-  color: #0f172a;
-  margin-bottom: 1pt;
-}
-
-.cv-paper.single-page .cv-project-tech {
-  font-weight: 400;
-  font-size: 7.8pt;
-  color: #475569;
-}
-
-.cv-paper.single-page .cv-edu-item {
-  font-size: 8pt;
-  line-height: 1.3;
-  color: #1e293b;
-  margin-bottom: 1.5pt;
-  page-break-inside: avoid;
-  break-inside: avoid;
-}
-
-.cv-paper.single-page .cv-edu-degree {
-  font-weight: 700;
-  color: #0f172a;
-}
-
-.cv-paper.single-page .cv-edu-inst {
-  color: #334155;
-}
-
-.cv-paper.single-page .cv-edu-years {
-  color: #475569;
-}
-
-.cv-paper.single-page .cv-page-break {
-  display: none !important;
-}
-
-/* -------------------------------------------------------------
-   MODE 2: TWO-PAGE DETAILED (Generous spacing & clean page break)
-   ------------------------------------------------------------- */
-.cv-paper.two-page {
-  padding: 12mm 15mm 12mm 15mm;
-  font-size: 9.2pt;
-  line-height: 1.42;
-}
-
-.cv-paper.two-page .cv-name {
+/* CV Header */
+.cv-name {
+  font-family: inherit;
   font-size: 19pt;
   font-weight: 800;
   letter-spacing: 0.02em;
@@ -781,7 +626,7 @@ body {
   margin-bottom: 3pt;
 }
 
-.cv-paper.two-page .cv-target-title {
+.cv-target-title {
   font-size: 9.8pt;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -790,7 +635,7 @@ body {
   margin-bottom: 5pt;
 }
 
-.cv-paper.two-page .cv-contact-line {
+.cv-contact-line {
   font-size: 8pt;
   color: #334155;
   line-height: 1.4;
@@ -798,18 +643,19 @@ body {
   word-break: break-word;
 }
 
-.cv-paper.two-page .cv-contact-line a {
+.cv-contact-line a {
   color: #0284c7;
   text-decoration: underline;
 }
 
-.cv-paper.two-page .cv-section {
-  margin-bottom: 9pt;
+/* CV Sections */
+.cv-section {
+  margin-bottom: 10pt;
   page-break-inside: avoid;
   break-inside: avoid;
 }
 
-.cv-paper.two-page .cv-section-title {
+.cv-section-title {
   font-size: 9.5pt;
   font-weight: 800;
   letter-spacing: 0.05em;
@@ -820,32 +666,34 @@ body {
   margin-bottom: 5.5pt;
 }
 
-.cv-paper.two-page .cv-summary-text {
+.cv-summary-text {
   font-size: 9pt;
   color: #1e293b;
   line-height: 1.45;
   text-align: justify;
 }
 
-.cv-paper.two-page .cv-skill-line {
+/* Core Skills Table / Lines */
+.cv-skill-line {
   font-size: 8.8pt;
   line-height: 1.4;
   margin-bottom: 3.5pt;
   color: #1e293b;
 }
 
-.cv-paper.two-page .cv-skill-category {
+.cv-skill-category {
   font-weight: 700;
   color: #0f172a;
 }
 
-.cv-paper.two-page .cv-job-entry {
-  margin-bottom: 7.5pt;
+/* Experience & Job Entries */
+.cv-job-entry {
+  margin-bottom: 8pt;
   page-break-inside: avoid;
   break-inside: avoid;
 }
 
-.cv-paper.two-page .cv-job-header {
+.cv-job-header {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
@@ -853,92 +701,69 @@ body {
   margin-bottom: 2.5pt;
 }
 
-.cv-paper.two-page .cv-job-role-company {
+.cv-job-role-company {
   font-weight: 700;
   color: #0f172a;
 }
 
-.cv-paper.two-page .cv-job-meta {
+.cv-job-meta {
   font-size: 8.5pt;
   color: #475569;
   font-style: italic;
 }
 
-.cv-paper.two-page .cv-bullet-list {
+.cv-bullet-list {
   list-style-type: disc;
   margin-left: 15pt;
   margin-bottom: 4pt;
 }
 
-.cv-paper.two-page .cv-bullet-list li {
+.cv-bullet-list li {
   font-size: 8.8pt;
   color: #1e293b;
   line-height: 1.4;
   margin-bottom: 2.5pt;
 }
 
-.cv-paper.two-page .cv-project-entry {
+/* Build Examples / Projects */
+.cv-project-entry {
   margin-bottom: 6pt;
   page-break-inside: avoid;
   break-inside: avoid;
 }
 
-.cv-paper.two-page .cv-project-title {
+.cv-project-title {
   font-weight: 700;
   font-size: 9pt;
   color: #0f172a;
   margin-bottom: 1.5pt;
 }
 
-.cv-paper.two-page .cv-project-tech {
+.cv-project-tech {
   font-weight: 400;
   font-size: 8.5pt;
   color: #475569;
 }
 
-.cv-paper.two-page .cv-edu-item {
+/* Education & Additional Learning */
+.cv-edu-item {
   font-size: 8.8pt;
   line-height: 1.4;
   color: #1e293b;
   margin-bottom: 2.5pt;
-  page-break-inside: avoid;
-  break-inside: avoid;
 }
 
-.cv-paper.two-page .cv-edu-degree {
+.cv-edu-degree {
   font-weight: 700;
   color: #0f172a;
 }
 
-.cv-paper.two-page .cv-edu-inst {
+.cv-edu-inst {
   color: #334155;
 }
 
-.cv-paper.two-page .cv-edu-years {
+.cv-edu-years {
   color: #475569;
-}
-
-.cv-paper.two-page .cv-page-break {
-  display: block;
-  page-break-before: always;
-  break-before: page;
-  height: 1px;
-  margin: 16mm 0 10mm 0;
-  border-top: 1px dashed #94a3b8;
-  position: relative;
-}
-
-.cv-paper.two-page .cv-page-break::after {
-  content: '✂ PAGE BREAK (Page 2 Starts Here)';
-  position: absolute;
-  top: -9px;
-  right: 0;
-  background: #ffffff;
-  color: #64748b;
-  font-size: 7pt;
-  padding: 0 6px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
 }
 
 /* ===================================================================
@@ -947,7 +772,7 @@ body {
    =================================================================== */
 @page {
   size: A4 portrait;
-  margin: 8mm 10mm 8mm 10mm;
+  margin: 12mm 14mm 12mm 14mm;
 }
 
 @media print {
@@ -986,31 +811,6 @@ body {
     padding: 0 !important;
     margin: 0 !important;
     border-radius: 0 !important;
-  }
-
-  .cv-page-break {
-    border-top: none !important;
-    margin: 0 !important;
-    height: 0 !important;
-  }
-
-  .cv-page-break::after {
-    display: none !important;
-  }
-
-  .cv-section,
-  .cv-job-entry,
-  .cv-project-entry,
-  .cv-edu-item {
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
-}
-    min-height: auto !important;
-    box-shadow: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    border-radius: 0 !important;
     page-break-after: auto;
   }
 
@@ -1025,6 +825,110 @@ body {
   .cv-project-entry {
     page-break-inside: avoid;
   }
+
+  .cv-edu-item {
+    page-break-inside: avoid;
+  }
+
+  .cl-paper {
+    width: 100% !important;
+    min-height: auto !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+}
+
+/* ===================================================================
+   Cover Letter Paper (Executive A4 Layout Matching CV Aesthetic)
+   =================================================================== */
+.cl-paper {
+  display: block;
+}
+
+.cl-header {
+  border-bottom: 1.2pt solid #0f172a;
+  padding-bottom: 8pt;
+  margin-bottom: 14pt;
+}
+
+.cl-name {
+  font-family: inherit;
+  font-size: 19pt;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #0f172a;
+  text-transform: uppercase;
+  line-height: 1.15;
+  margin-bottom: 3pt;
+}
+
+.cl-target-title {
+  font-size: 9.8pt;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #1e293b;
+  text-transform: uppercase;
+  margin-bottom: 5pt;
+}
+
+.cl-contact-line {
+  font-size: 8pt;
+  color: #334155;
+  line-height: 1.45;
+}
+
+.cl-contact-line a {
+  color: #0284c7;
+  text-decoration: underline;
+}
+
+.cl-meta-block {
+  margin-bottom: 14pt;
+  font-size: 9pt;
+  line-height: 1.5;
+  color: #334155;
+}
+
+.cl-date {
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 8pt;
+}
+
+.cl-recipient {
+  margin-bottom: 10pt;
+  line-height: 1.4;
+}
+
+.cl-subject {
+  font-weight: 700;
+  font-size: 9.8pt;
+  color: #0f172a;
+  margin-bottom: 10pt;
+}
+
+.cl-salutation {
+  font-weight: 600;
+  font-size: 9.2pt;
+  color: #0f172a;
+  margin-bottom: 9pt;
+}
+
+.cl-body-paragraph {
+  font-size: 9.2pt;
+  line-height: 1.5;
+  color: #1e293b;
+  margin-bottom: 9pt;
+  text-align: justify;
+}
+
+.cl-signoff {
+  margin-top: 16pt;
+  font-size: 9.2pt;
+  line-height: 1.45;
+  color: #0f172a;
+  font-weight: 600;
 }
 
 /* Responsive */

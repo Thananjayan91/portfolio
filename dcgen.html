@@ -96,11 +96,17 @@
           </div>
         </div>
 
-        <!-- Submit Button -->
-        <button type="submit" id="btn-generate" class="btn-generate">
-          <i class="fa-solid fa-wand-magic-sparkles"></i>
-          <span>Generate Tailored CV</span>
-        </button>
+        <!-- Submit Buttons -->
+        <div class="form-btn-stack">
+          <button type="submit" id="btn-generate" class="btn-generate">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span>Generate Tailored CV</span>
+          </button>
+          <button type="button" id="btn-generate-cl" class="btn-generate btn-cover-letter">
+            <i class="fa-solid fa-envelope-open-text"></i>
+            <span>Generate Cover Letter</span>
+          </button>
+        </div>
       </form>
 
       <!-- Status Indicator -->
@@ -136,28 +142,28 @@
       <!-- Action Toolbar -->
       <div class="cv-toolbar">
         <div class="toolbar-left">
-          <div class="page-mode-toggle" id="page-mode-toggle">
-            <button type="button" class="btn-mode active" id="btn-mode-1page" title="Compact 1-Page Layout (ATS Gold Standard - Recommended for HR)">
-              <i class="fa-solid fa-file-lines"></i> 1-Page ATS (Recommended)
+          <div class="doc-tab-toggle" id="doc-tab-toggle">
+            <button type="button" class="btn-tab active" id="tab-cv" title="View & Download Tailored CV">
+              <i class="fa-solid fa-file-lines"></i> Tailored CV
             </button>
-            <button type="button" class="btn-mode" id="btn-mode-2page" title="Expanded 2-Page Layout with Clean Section Breaks">
-              <i class="fa-solid fa-copy"></i> 2-Page Detailed
+            <button type="button" class="btn-tab" id="tab-cl" title="View & Download Tailored Cover Letter">
+              <i class="fa-solid fa-envelope-open-text"></i> Cover Letter
             </button>
           </div>
         </div>
 
         <div class="toolbar-actions">
-          <button type="button" class="btn-tool edit-toggle" id="btn-edit-toggle" title="Click to edit text directly on the CV">
+          <button type="button" class="btn-tool edit-toggle" id="btn-edit-toggle" title="Click to edit text directly on the document">
             <i class="fa-solid fa-pen-to-square"></i> Edit Live
           </button>
-          <button type="button" class="btn-tool" id="btn-copy-md" title="Copy ATS-friendly Markdown">
-            <i class="fa-regular fa-copy"></i> Copy Markdown
+          <button type="button" class="btn-tool" id="btn-copy-md" title="Copy Text to Clipboard">
+            <i class="fa-regular fa-copy"></i> Copy Text
           </button>
           <button type="button" class="btn-tool" id="btn-print-pdf" title="Native Vector Print-to-PDF">
             <i class="fa-solid fa-print"></i> Print PDF
           </button>
           <button type="button" class="btn-tool primary-download" id="btn-download-pdf" title="1-Click Direct PDF Download">
-            <i class="fa-solid fa-download"></i> Download PDF
+            <i class="fa-solid fa-download"></i> <span id="download-btn-label">Download CV (PDF)</span>
           </button>
         </div>
       </div>
@@ -169,9 +175,14 @@
           <span>Live Edit Mode Active: You can click and modify any line, bullet, or heading directly on the paper.</span>
         </div>
 
-        <!-- A4 Document Paper Container -->
+        <!-- A4 Document Paper Container (Tailored CV) -->
         <article class="cv-paper" id="cv-paper" contenteditable="false">
           <!-- Dynamic Content Rendered Here via dcgen.js -->
+        </article>
+
+        <!-- A4 Document Paper Container (Cover Letter) -->
+        <article class="cv-paper cl-paper" id="cl-paper" contenteditable="false" style="display: none;">
+          <!-- Dynamic Cover Letter Rendered Here via dcgen.js -->
         </article>
       </div>
 

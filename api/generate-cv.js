@@ -223,6 +223,18 @@ Generate a tailored JSON response with the following exact keys:
     "Exploring formal AI evaluation and testing frameworks for production AI systems",
     "Salesforce platform development (Trailhead Ranger, 10 Superbadges completed) — Flow automation and process design"
   ],
+  "coverLetter": {
+    "salutation": "Dear Hiring Team,",
+    "subject": "Application for [Target Title] at [Target Company]",
+    "paragraphs": [
+      "I am writing to express my strong enthusiasm for the [Target Title] position at [Target Company]. With 3+ years of experience independently designing, building, and deploying production AI systems and Python/Flask microservices at Flipick, I bring a demonstrated track record of taking complex requirements and shipping functional, high-value AI solutions.",
+      "In reviewing your needs for [Target Company], I noted your emphasis on [key requirement from JD]. At Flipick, I engineered end-to-end RAG pipelines and integrated multiple leading LLM APIs (OpenAI, Anthropic Claude, Google Gemini), implementing prompt engineering, structured JSON validation, and retrieval accuracy optimizations.",
+      "Beyond document intelligence, I developed an AI-powered course content generation engine (PDF to automated PPTX/SCORM layout) and an AI cinematic video creation platform with Google Veo 3 and Kling. All of these workflows were deployed and maintained on AWS EC2 with Gunicorn and Nginx reverse proxies, prioritizing uptime, speed, and real production utility over prototypes.",
+      "My academic background includes a Bachelor of Information Technology (BIT) from the University of Colombo, UCSC, alongside Salesforce Trailhead Ranger recognition with 10 Superbadges, demonstrating my disciplined technical foundation and ability to master new platforms quickly.",
+      "I would welcome the opportunity to discuss how my hands-on AI building experience, backend engineering skills, and independent shipping mindset can help [Target Company] achieve its technical goals. Thank you for your time and consideration."
+    ],
+    "signoff": "Sincerely,\nThananjayan Aruljothy\nAI Full-Stack Engineer"
+  },
   "matchAnalysis": {
     "matchScore": 88,
     "matchedKeywords": ["Keyword1", "Keyword2", "Keyword3", "Keyword4", "Keyword5"],

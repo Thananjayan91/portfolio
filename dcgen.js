@@ -67,10 +67,11 @@ const CANDIDATE_CONSTANTS = {
 };
 
 // === 2. INITIAL BASELINE (Matches Dispensed AI Builder CV format) ===
-let currentLayoutMode = '1page'; // '1page' (ATS Gold Standard) or '2page'
+let currentDocType = 'cv'; // 'cv' or 'cl'
 
 let activeCVData = {
   targetTitle: "AI BUILDER | AI-POWERED APPS, AUTOMATIONS & PRODUCTION TOOLS",
+  targetCompany: "Target Company",
   summary: "Software engineer with 3+ years of experience independently building and shipping AI-powered applications and automation pipelines that saw real production use — including an end-to-end AI content generation platform (PDF upload, RAG, AI-generated content, automated output as PPTX/SCORM) and an AI video generation platform (concept to character-consistent video to final rendered output). Comfortable coding and deploying independently, working with prompting, retrieval-augmented generation (RAG), APIs, and structured data handling. Bring a genuine, repeated track record of taking an unclear problem and shipping a working AI-powered solution on my own.",
   coreSkills: [
     {
@@ -137,6 +138,18 @@ let activeCVData = {
     "Exploring formal AI evaluation and testing frameworks for production AI systems.",
     "Salesforce platform development (Trailhead Ranger, 10 Superbadges completed) — Flow automation and process design."
   ],
+  coverLetter: {
+    salutation: "Dear Hiring Team,",
+    subject: "Application for Senior Lead / AI Full-Stack Engineer at IFS",
+    paragraphs: [
+      "I am writing to express my strong enthusiasm for the Senior Lead position at IFS. With over 3 years of hands-on experience independently architecting, building, and deploying production AI systems and Python/Flask microservices at Flipick, I bring a demonstrated track record of taking complex requirements and shipping functional, high-value AI solutions.",
+      "In reviewing your needs for IFS, I noted your emphasis on architecting robust backend workflows and deploying reliable AI capabilities. At Flipick, I engineered end-to-end RAG pipelines and integrated multiple leading LLM APIs (OpenAI, Anthropic Claude, Google Gemini), implementing prompt engineering, structured JSON validation, and retrieval accuracy optimizations.",
+      "Beyond document intelligence, I developed an AI-powered course content generation engine (PDF to automated PPTX/SCORM layout) and an AI cinematic video creation platform with Google Veo 3 and Kling. All of these workflows were deployed and maintained on AWS EC2 with Gunicorn and Nginx reverse proxies, prioritizing uptime, speed, and real production utility over prototypes.",
+      "My academic background includes a Bachelor of Information Technology (BIT) from the University of Colombo, UCSC, alongside Salesforce Trailhead Ranger recognition with 10 Superbadges, demonstrating my disciplined technical foundation and ability to master new platforms quickly.",
+      "I would welcome the opportunity to discuss how my hands-on AI building experience, backend engineering skills, and independent shipping mindset can help IFS achieve its technical goals. Thank you for your time and consideration."
+    ],
+    signoff: "Sincerely,\nThananjayan Aruljothy\nAI Full-Stack Engineer"
+  },
   matchAnalysis: {
     matchScore: 92,
     matchedKeywords: ["Python", "Flask", "RAG", "LLM Integration", "AWS EC2", "OpenAI", "Claude", "REST APIs"],
@@ -200,8 +213,6 @@ function renderCV() {
   const paper = document.getElementById('cv-paper');
   if (!paper) return;
 
-  paper.className = `cv-paper ${currentLayoutMode === '1page' ? 'single-page' : 'two-page'}`;
-
   const c = CANDIDATE_CONSTANTS;
   const data = activeCVData;
 
@@ -214,7 +225,7 @@ function renderCV() {
         ${c.contact.location} | ${c.contact.workPreference} | 
         <a href="tel:${c.contact.phone}">${c.contact.phone}</a> | 
         <a href="mailto:${c.contact.email}">${c.contact.email}</a> | 
-        Portfolio: <a href="${c.contact.portfolioUrl}" target="_blank" rel="noopener">${c.contact.portfolio}</a> | 
+        <strong>Portfolio:</strong> <a href="${c.contact.portfolioUrl}" target="_blank" rel="noopener">${c.contact.portfolioUrl}</a><br />
         GitHub: <a href="${c.contact.githubUrl}" target="_blank" rel="noopener">${c.contact.github}</a> | 
         LinkedIn: <a href="${c.contact.linkedinUrl}" target="_blank" rel="noopener">${c.contact.linkedin}</a> | 
         Trailhead: <a href="${c.contact.trailheadUrl}" target="_blank" rel="noopener">${c.contact.trailhead}</a>
@@ -290,11 +301,8 @@ function renderCV() {
       </div>
     </section>
 
-    <!-- Dedicated Page Break for 2-Page Mode -->
-    <div class="cv-page-break"></div>
-
     <!-- Selected Build Examples / Key Projects -->
-    <section class="cv-section section-projects">
+    <section class="cv-section">
       <h2 class="cv-section-title">Selected Build Examples</h2>
       ${(data.tailoredProjects || []).map(p => `
         <div class="cv-project-entry">
@@ -328,6 +336,84 @@ function renderCV() {
   `;
 
   renderMatchAnalytics();
+}
+
+function renderCoverLetter() {
+  const paper = document.getElementById('cl-paper');
+  if (!paper) return;
+
+  const c = CANDIDATE_CONSTANTS;
+  const data = activeCVData;
+  const cl = data.coverLetter || {};
+
+  const compInput = (document.getElementById('company-input')?.value || data.targetCompany || 'the Hiring Company').trim();
+  const roleInput = (document.getElementById('job-title-input')?.value || data.targetTitle || 'AI Full-Stack Engineer').trim();
+  const todayStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+  paper.innerHTML = `
+    <!-- Header -->
+    <header class="cl-header">
+      <h1 class="cl-name">${c.name}</h1>
+      <div class="cl-target-title">${escapeHTML(roleInput)}</div>
+      <div class="cl-contact-line">
+        ${c.contact.location} | ${c.contact.workPreference} | 
+        <a href="tel:${c.contact.phone}">${c.contact.phone}</a> | 
+        <a href="mailto:${c.contact.email}">${c.contact.email}</a> | 
+        <strong>Portfolio:</strong> <a href="${c.contact.portfolioUrl}" target="_blank" rel="noopener">${c.contact.portfolioUrl}</a><br />
+        GitHub: <a href="${c.contact.githubUrl}" target="_blank" rel="noopener">${c.contact.github}</a> | 
+        LinkedIn: <a href="${c.contact.linkedinUrl}" target="_blank" rel="noopener">${c.contact.linkedin}</a> | 
+        Trailhead: <a href="${c.contact.trailheadUrl}" target="_blank" rel="noopener">${c.contact.trailhead}</a>
+      </div>
+    </header>
+
+    <!-- Meta / Recipient Block -->
+    <div class="cl-meta-block">
+      <div class="cl-date">${todayStr}</div>
+      <div class="cl-recipient">
+        <strong>Hiring Team / Recruitment Manager</strong><br />
+        ${escapeHTML(compInput)}
+      </div>
+      <div class="cl-subject">RE: Application for ${escapeHTML(roleInput)}</div>
+      <div class="cl-salutation">${escapeHTML(cl.salutation || 'Dear Hiring Team,')}</div>
+    </div>
+
+    <!-- Letter Body -->
+    <div class="cl-body">
+      ${(cl.paragraphs || []).map(p => `<p class="cl-body-paragraph">${escapeHTML(p)}</p>`).join('')}
+    </div>
+
+    <!-- Formal Signoff -->
+    <div class="cl-signoff">
+      <p>Sincerely,</p>
+      <p style="margin-top: 4pt; font-weight: 700; color: #0f172a;">${c.name}</p>
+      <p style="font-weight: 400; font-size: 8.5pt; color: #475569;">${escapeHTML(roleInput)}</p>
+    </div>
+  `;
+}
+
+function switchDocumentTab(docType) {
+  currentDocType = docType;
+  const tabCV = document.getElementById('tab-cv');
+  const tabCL = document.getElementById('tab-cl');
+  const cvPaper = document.getElementById('cv-paper');
+  const clPaper = document.getElementById('cl-paper');
+  const dlLabel = document.getElementById('download-btn-label');
+
+  if (docType === 'cl') {
+    tabCL?.classList.add('active');
+    tabCV?.classList.remove('active');
+    if (cvPaper) cvPaper.style.display = 'none';
+    if (clPaper) clPaper.style.display = 'block';
+    if (dlLabel) dlLabel.textContent = 'Download Cover Letter (PDF)';
+    renderCoverLetter();
+  } else {
+    tabCV?.classList.add('active');
+    tabCL?.classList.remove('active');
+    if (clPaper) clPaper.style.display = 'none';
+    if (cvPaper) cvPaper.style.display = 'block';
+    if (dlLabel) dlLabel.textContent = 'Download CV (PDF)';
+    renderCV();
+  }
 }
 
 function renderMatchAnalytics() {
@@ -554,43 +640,47 @@ Generate JSON matching this exact structure:
 }
 
 // === 6. PDF EXPORT & TOOLBAR ACTIONS ===
-function downloadPDF() {
-  const paper = document.getElementById('cv-paper');
-  if (!paper) return;
+function getDownloadFilename(docType = 'CV') {
+  const compInput = (document.getElementById('company-input')?.value || activeCVData.targetCompany || '').trim();
+  const titleInput = (document.getElementById('job-title-input')?.value || activeCVData.targetTitle || 'Senior_Lead').trim();
 
-  const roleName = (activeCVData.targetTitle || 'AI_Builder')
-    .replace(/[^a-zA-Z0-9]/g, '_')
-    .slice(0, 30);
-  const modeSuffix = currentLayoutMode === '1page' ? '1Page' : '2Page';
-  const filename = `Thananjayan_Aruljothy_CV_${roleName}_${modeSuffix}.pdf`;
+  const sanitize = (str) => str.replace(/[^a-zA-Z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+
+  const companyClean = sanitize(compInput) || 'General';
+  const roleClean = sanitize(titleInput) || 'Software_Engineer';
+
+  if (docType === 'Cover_Letter') {
+    return `Thananjayan_Aruljothy_Cover_Letter_${companyClean}_${roleClean}.pdf`;
+  }
+  return `Thananjayan_Aruljothy_CV_${companyClean}_${roleClean}.pdf`;
+}
+
+function downloadPDF() {
+  const isCoverLetter = currentDocType === 'cl';
+  const targetElement = isCoverLetter ? document.getElementById('cl-paper') : document.getElementById('cv-paper');
+  if (!targetElement) return;
+
+  const filename = getDownloadFilename(isCoverLetter ? 'Cover_Letter' : 'CV');
 
   // Use html2pdf.js if available
   if (typeof html2pdf !== 'undefined') {
-    const wasEditable = paper.getAttribute('contenteditable') === 'true';
-    if (wasEditable) paper.setAttribute('contenteditable', 'false');
+    const wasEditable = targetElement.getAttribute('contenteditable') === 'true';
+    if (wasEditable) targetElement.setAttribute('contenteditable', 'false');
 
     const opt = {
-      margin: 0, // 0 margin to prevent double-padding & artificial page splitting
+      margin: [10, 12, 10, 12],
       filename: filename,
       image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: {
-        scale: 2,
-        useCORS: true,
-        letterRendering: true,
-        logging: false,
-        scrollY: 0,
-        scrollX: 0
-      },
+      html2canvas: { scale: 2, useCORS: true, logging: false },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
       pagebreak: {
         mode: ['avoid-all', 'css', 'legacy'],
-        before: '.cv-page-break',
-        avoid: ['.cv-section', '.cv-job-entry', '.cv-project-entry', '.cv-edu-item']
+        avoid: ['.cv-section', '.cv-job-entry', '.cv-project-entry', '.cv-edu-item', '.cl-header', '.cl-meta-block', '.cl-body-paragraph', '.cl-signoff']
       }
     };
 
-    html2pdf().set(opt).from(paper).save().then(() => {
-      if (wasEditable) paper.setAttribute('contenteditable', 'true');
+    html2pdf().set(opt).from(targetElement).save().then(() => {
+      if (wasEditable) targetElement.setAttribute('contenteditable', 'true');
     });
   } else {
     // Fallback: trigger native browser print
@@ -606,10 +696,43 @@ function copyMarkdown() {
   const d = activeCVData;
   const c = CANDIDATE_CONSTANTS;
 
+  if (currentDocType === 'cl') {
+    const cl = d.coverLetter || {};
+    const compInput = (document.getElementById('company-input')?.value || d.targetCompany || 'the Hiring Company').trim();
+    const roleInput = (document.getElementById('job-title-input')?.value || d.targetTitle || 'AI Full-Stack Engineer').trim();
+    const todayStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+    const clText = `${c.name}
+${c.contact.location} | ${c.contact.phone} | ${c.contact.email}
+Portfolio: ${c.contact.portfolioUrl} | GitHub: https://${c.contact.github} | LinkedIn: https://${c.contact.linkedin}
+
+${todayStr}
+
+To: Hiring Team / Recruitment Manager
+${compInput}
+
+RE: Application for ${roleInput}
+
+${cl.salutation || 'Dear Hiring Team,'}
+
+${(cl.paragraphs || []).join('\n\n')}
+
+Sincerely,
+${c.name}
+${roleInput}
+`;
+    navigator.clipboard.writeText(clText).then(() => {
+      alert('Cover Letter copied to clipboard!');
+    }).catch(() => {
+      alert('Unable to copy automatically. Please select text manually.');
+    });
+    return;
+  }
+
   const md = `# ${c.name}
 **${d.targetTitle}**
 ${c.contact.location} | ${c.contact.workPreference} | ${c.contact.phone} | ${c.contact.email}
-Portfolio: https://${c.contact.portfolio} | GitHub: https://${c.contact.github} | LinkedIn: https://${c.contact.linkedin} | Trailhead: https://${c.contact.trailhead}
+Portfolio: ${c.contact.portfolioUrl} | GitHub: https://${c.contact.github} | LinkedIn: https://${c.contact.linkedin} | Trailhead: https://${c.contact.trailhead}
 
 ---
 
@@ -665,7 +788,7 @@ ${(d.additionalLearning || []).map(b => `- ${b}`).join('\n')}
 }
 
 function toggleEditMode() {
-  const paper = document.getElementById('cv-paper');
+  const paper = currentDocType === 'cl' ? document.getElementById('cl-paper') : document.getElementById('cv-paper');
   const btn = document.getElementById('btn-edit-toggle');
   const banner = document.getElementById('edit-banner');
   if (!paper || !btn) return;
@@ -686,36 +809,32 @@ function toggleEditMode() {
 
 // === 7. INITIALIZATION ===
 document.addEventListener('DOMContentLoaded', () => {
-  // Render initial default CV
+  // Render initial default documents
   renderCV();
+  renderCoverLetter();
 
   // Attach form listeners
   const form = document.getElementById('jd-form');
-  if (form) form.addEventListener('submit', handleGenerate);
+  if (form) form.addEventListener('submit', (e) => handleGenerate(e));
+
+  // Dedicated Cover Letter generation button
+  const btnGenCL = document.getElementById('btn-generate-cl');
+  if (btnGenCL) {
+    btnGenCL.addEventListener('click', async (e) => {
+      await handleGenerate(e);
+      switchDocumentTab('cl');
+    });
+  }
+
+  // Document tab listeners (CV vs Cover Letter)
+  document.getElementById('tab-cv')?.addEventListener('click', () => switchDocumentTab('cv'));
+  document.getElementById('tab-cl')?.addEventListener('click', () => switchDocumentTab('cl'));
 
   // Attach toolbar listeners
   document.getElementById('btn-download-pdf')?.addEventListener('click', downloadPDF);
   document.getElementById('btn-print-pdf')?.addEventListener('click', printVectorPDF);
   document.getElementById('btn-copy-md')?.addEventListener('click', copyMarkdown);
   document.getElementById('btn-edit-toggle')?.addEventListener('click', toggleEditMode);
-
-  // Layout mode switcher (1-Page ATS vs 2-Page Detailed)
-  const btn1Page = document.getElementById('btn-mode-1page');
-  const btn2Page = document.getElementById('btn-mode-2page');
-
-  btn1Page?.addEventListener('click', () => {
-    currentLayoutMode = '1page';
-    btn1Page.classList.add('active');
-    btn2Page?.classList.remove('active');
-    renderCV();
-  });
-
-  btn2Page?.addEventListener('click', () => {
-    currentLayoutMode = '2page';
-    btn2Page.classList.add('active');
-    btn1Page?.classList.remove('active');
-    renderCV();
-  });
 
   // Presets listeners
   document.querySelectorAll('.preset-pill').forEach(pill => {
