@@ -598,7 +598,7 @@ body {
   min-height: 297mm;
   background: #ffffff;
   color: #111827;
-  padding: 14mm 18mm 14mm 18mm;
+  padding: 12mm 15mm 12mm 15mm;
   box-shadow: 0 15px 45px rgba(0, 0, 0, 0.6), 0 2px 8px rgba(0, 0, 0, 0.4);
   border-radius: 2px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -614,9 +614,6 @@ body {
 .cv-paper.exporting-pdf {
   box-shadow: none !important;
   border-radius: 0 !important;
-  margin: 0 !important;
-  width: 210mm !important;
-  max-width: 210mm !important;
   transform: none !important;
 }
 
@@ -682,7 +679,8 @@ body {
   font-size: 9pt;
   color: #1e293b;
   line-height: 1.45;
-  text-align: justify;
+  text-align: left;
+  padding-right: 6pt;
 }
 
 /* Core Skills Table / Lines */
@@ -690,6 +688,7 @@ body {
   font-size: 8.8pt;
   line-height: 1.4;
   margin-bottom: 3.5pt;
+  padding-right: 6pt;
   color: #1e293b;
 }
 
@@ -711,6 +710,7 @@ body {
   align-items: baseline;
   font-size: 9pt;
   margin-bottom: 2.5pt;
+  padding-right: 4pt;
 }
 
 .cv-job-role-company {
@@ -722,11 +722,15 @@ body {
   font-size: 8.5pt;
   color: #475569;
   font-style: italic;
+  text-align: right;
+  white-space: nowrap;
+  padding-left: 8pt;
 }
 
 .cv-bullet-list {
   list-style-type: disc;
   margin-left: 15pt;
+  margin-right: 4pt;
   margin-bottom: 4pt;
 }
 
@@ -862,6 +866,7 @@ body {
   border-bottom: 1.2pt solid #0f172a;
   padding-bottom: 8pt;
   margin-bottom: 14pt;
+  padding-right: 8pt;
 }
 
 .cl-name {
@@ -900,6 +905,7 @@ body {
   font-size: 9pt;
   line-height: 1.5;
   color: #334155;
+  padding-right: 8pt;
 }
 
 .cl-date {
@@ -932,7 +938,8 @@ body {
   line-height: 1.5;
   color: #1e293b;
   margin-bottom: 9pt;
-  text-align: justify;
+  text-align: left;
+  padding-right: 8pt;
 }
 
 .cl-signoff {
@@ -941,6 +948,7 @@ body {
   line-height: 1.45;
   color: #0f172a;
   font-weight: 600;
+  padding-right: 8pt;
 }
 
 /* Responsive */
