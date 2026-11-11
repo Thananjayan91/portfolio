@@ -200,6 +200,7 @@ ${topContext}
 Generate a tailored JSON response with the following exact keys:
 {
   "targetTitle": "Authentic professional title using ONLY Thananjayan's VERIFIED skills. MUST start with 'FULLSTACK AI ENGINEER', 'PYTHON ENGINEER', 'FULLSTACK ENGINEER', or 'AI BUILDER', followed by a subtitle of his REAL tech stack relevant to the JD (e.g. 'FULLSTACK AI ENGINEER | PYTHON, LLM APIS & CLOUD DEPLOYMENT' or 'PYTHON ENGINEER | FLASK BACKENDS, REST APIS & AWS EC2'). NEVER put 'SENIOR', 'LEAD', or unfamiliar JD industries like 'MARITIME SOFTWARE'.",
+  "targetCountry": "Country of the job location extracted from the JD (e.g. 'Norway', 'Singapore', 'United Kingdom', 'Germany', 'Australia', etc.), or empty string '' if unspecified or Remote-only.",
   "summary": "Compelling 4-5 line professional summary strictly grounded in Thananjayan's VERIFIED indexed CV (3+ years at Flipick, Python/Flask, REST APIs, multi-LLM integrations, RAG pipelines, AWS EC2, plus INSEE Cement SAP/logistics background if operationally relevant). NEVER claim prior experience in unfamiliar JD domains (like maritime software or offline sync).",
   "coreSkills": [
     { "category": "Primary Domain (Verified)", "skills": "ONLY verified strengths from his indexed CV most relevant to this JD (e.g. Full-stack web applications, Python/Flask APIs, AI workflow automation, operational/SAP logistics coordination). NEVER copy unverified JD responsibilities here." },

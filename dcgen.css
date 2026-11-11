@@ -248,6 +248,38 @@ body {
   gap: 0.75rem;
 }
 
+/* Cover Letter Visa & Relocation Checkbox */
+.cl-option-box {
+  margin-bottom: 1rem;
+  padding: 0.7rem 0.85rem;
+  background: rgba(16, 185, 129, 0.06);
+  border: 1px solid rgba(16, 185, 129, 0.22);
+  border-radius: var(--radius-sm);
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #e2e8f0;
+  cursor: pointer;
+  user-select: none;
+}
+
+.custom-checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent-green);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.country-input-wrap {
+  margin-top: 0.6rem;
+}
+
 /* API Key toggle accordion */
 .api-key-accordion {
   margin-bottom: 1.25rem;

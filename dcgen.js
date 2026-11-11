@@ -338,6 +338,59 @@ function renderCV() {
   renderMatchAnalytics();
 }
 
+function detectCountryFromJD(jdText) {
+  if (!jdText) return '';
+  const countryPatterns = [
+    { name: 'Norway', regex: /\b(norway|stavanger|oslo|bergen|trondheim|skudeneshavn|haugesund)\b/i },
+    { name: 'United Kingdom', regex: /\b(united kingdom|uk|london|manchester|edinburgh|birmingham|bristol)\b/i },
+    { name: 'Germany', regex: /\b(germany|berlin|munich|hamburg|frankfurt|stuttgart|cologne)\b/i },
+    { name: 'Netherlands', regex: /\b(netherlands|holland|amsterdam|rotterdam|utrecht|eindhoven)\b/i },
+    { name: 'Sweden', regex: /\b(sweden|stockholm|gothenburg|malmö|malmo)\b/i },
+    { name: 'Denmark', regex: /\b(denmark|copenhagen|aarhus)\b/i },
+    { name: 'Finland', regex: /\b(finland|helsinki|espoo|tampere)\b/i },
+    { name: 'Ireland', regex: /\b(ireland|dublin|cork|galway)\b/i },
+    { name: 'Switzerland', regex: /\b(switzerland|zurich|zürich|geneva|basel)\b/i },
+    { name: 'Singapore', regex: /\b(singapore)\b/i },
+    { name: 'Australia', regex: /\b(australia|sydney|melbourne|brisbane|perth|adelaide)\b/i },
+    { name: 'New Zealand', regex: /\b(new zealand|auckland|wellington|christchurch)\b/i },
+    { name: 'Canada', regex: /\b(canada|toronto|vancouver|montreal|ottawa|calgary)\b/i },
+    { name: 'United States', regex: /\b(united states|usa|san francisco|new york|seattle|austin|boston)\b/i },
+    { name: 'United Arab Emirates', regex: /\b(uae|united arab emirates|dubai|abu dhabi)\b/i }
+  ];
+
+  for (const entry of countryPatterns) {
+    if (entry.regex.test(jdText)) return entry.name;
+  }
+  return '';
+}
+
+function getCoverLetterParagraphs(cl, targetJobRole) {
+  const paragraphs = (cl.paragraphs && cl.paragraphs.length > 0) ? [...cl.paragraphs] : [];
+  if (paragraphs.length > 0) {
+    paragraphs[0] = paragraphs[0].replace(
+      /for the (?:FULLSTACK AI ENGINEER|AI BUILDER|PYTHON ENGINEER|FULLSTACK ENGINEER|AI Full-Stack Engineer|Senior Lead|\[Target Title\]) position at/i,
+      `for the ${targetJobRole} position at`
+    );
+  }
+
+  const visaCheckbox = document.getElementById('visa-relocation-checkbox');
+  if (visaCheckbox && visaCheckbox.checked) {
+    const manualCountry = document.getElementById('job-country-input')?.value.trim() || '';
+    const country = manualCountry || activeCVData.targetCountry || detectCountryFromJD(document.getElementById('jd-input')?.value || '');
+    const visaSentence = country
+      ? `Please note that I am currently based in Sri Lanka and would require visa sponsorship and relocation support to relocate to ${country} for this role. I am fully open to relocating and committed to making a smooth transition.`
+      : `Please note that I am currently based in Sri Lanka and would require visa sponsorship and relocation support for this role. I am fully open to relocating and committed to making a smooth transition.`;
+
+    if (paragraphs.length > 1) {
+      paragraphs.splice(paragraphs.length - 1, 0, visaSentence);
+    } else {
+      paragraphs.push(visaSentence);
+    }
+  }
+
+  return paragraphs;
+}
+
 function renderCoverLetter() {
   const paper = document.getElementById('cl-paper');
   if (!paper) return;
@@ -352,14 +405,7 @@ function renderCoverLetter() {
   const candidateHeadline = candidateTitle.split('|')[0].trim();
   const todayStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
-  // Ensure paragraph 1 explicitly and cleanly references the target role being applied for
-  let paragraphs = (cl.paragraphs && cl.paragraphs.length > 0) ? [...cl.paragraphs] : [];
-  if (paragraphs.length > 0) {
-    paragraphs[0] = paragraphs[0].replace(
-      /for the (?:FULLSTACK AI ENGINEER|AI BUILDER|PYTHON ENGINEER|FULLSTACK ENGINEER|AI Full-Stack Engineer|Senior Lead|\[Target Title\]) position at/i,
-      `for the ${targetJobRole} position at`
-    );
-  }
+  const paragraphs = getCoverLetterParagraphs(cl, targetJobRole);
 
   paper.innerHTML = `
     <!-- Header -->
@@ -578,6 +624,7 @@ ${cvContext}
 Generate JSON matching this exact structure:
 {
   "targetTitle": "Authentic title starting with FULLSTACK AI ENGINEER, PYTHON ENGINEER, FULLSTACK ENGINEER, or AI BUILDER + subtitle of ONLY his verified stack. NO 'SENIOR', 'LEAD', or unfamiliar JD domains.",
+  "targetCountry": "Country of the job location extracted from the JD (e.g. 'Norway', 'Singapore', 'United Kingdom', 'Germany'), or empty string '' if unspecified or Remote-only.",
   "summary": "Compelling 4-line summary strictly grounded in verified indexed CV facts. Never claim unfamiliar JD domain experience.",
   "coreSkills": [
     { "category": "Primary Domain (Verified)", "skills": "ONLY verified skills from indexed CV most relevant to JD (never copy unverified JD responsibilities)" },
@@ -656,8 +703,16 @@ Generate JSON matching this exact structure:
       ...resData.data
     };
 
-    // Re-render CV
+    // Auto-populate target country if extracted by AI and user hasn't entered one manually
+    const countryInput = document.getElementById('job-country-input');
+    if (countryInput && !countryInput.value.trim()) {
+      const detected = resData.data.targetCountry || detectCountryFromJD(jd);
+      if (detected) countryInput.value = detected;
+    }
+
+    // Re-render CV and Cover Letter
     renderCV();
+    renderCoverLetter();
 
     // Scroll preview into view on mobile
     if (window.innerWidth < 1100) {
@@ -730,13 +785,7 @@ function copyMarkdown() {
     const candidateHeadline = candidateTitle.split('|')[0].trim();
     const todayStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
-    let paragraphs = (cl.paragraphs && cl.paragraphs.length > 0) ? [...cl.paragraphs] : [];
-    if (paragraphs.length > 0) {
-      paragraphs[0] = paragraphs[0].replace(
-        /for the (?:FULLSTACK AI ENGINEER|AI BUILDER|PYTHON ENGINEER|FULLSTACK ENGINEER|AI Full-Stack Engineer|Senior Lead|\[Target Title\]) position at/i,
-        `for the ${targetJobRole} position at`
-      );
-    }
+    const paragraphs = getCoverLetterParagraphs(cl, targetJobRole);
 
     const clText = `${c.name}
 ${candidateTitle}
@@ -889,6 +938,35 @@ document.addEventListener('DOMContentLoaded', () => {
         jdInput?.focus();
       }
     });
+  });
+
+  // Visa & Relocation checkbox listener (updates Cover Letter live)
+  const visaCheckbox = document.getElementById('visa-relocation-checkbox');
+  const countryWrap = document.getElementById('country-input-wrap');
+  const countryInput = document.getElementById('job-country-input');
+
+  visaCheckbox?.addEventListener('change', () => {
+    if (countryWrap) {
+      countryWrap.style.display = visaCheckbox.checked ? 'block' : 'none';
+    }
+    if (visaCheckbox.checked && countryInput && !countryInput.value.trim()) {
+      const jdVal = document.getElementById('jd-input')?.value || '';
+      const detected = activeCVData.targetCountry || detectCountryFromJD(jdVal);
+      if (detected) countryInput.value = detected;
+    }
+    renderCoverLetter();
+  });
+
+  countryInput?.addEventListener('input', () => {
+    if (visaCheckbox?.checked) renderCoverLetter();
+  });
+
+  // Live update Cover Letter when Role or Company changes
+  document.getElementById('job-title-input')?.addEventListener('input', () => {
+    if (currentDocType === 'cl') renderCoverLetter();
+  });
+  document.getElementById('company-input')?.addEventListener('input', () => {
+    if (currentDocType === 'cl') renderCoverLetter();
   });
 
   // API Key accordion toggle
