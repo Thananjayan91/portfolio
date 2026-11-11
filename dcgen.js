@@ -539,31 +539,35 @@ async function handleGenerate(e) {
         const cvRes = await fetch('./data/cv_index.json');
         if (cvRes.ok) {
           const cvJson = await cvRes.json();
-          cvContext = (cvJson.chunks || []).slice(0, 4).map(c => `[${c.title}]\n${c.text}`).join('\n\n');
+          cvContext = (cvJson.chunks || []).map(c => `[${c.title}]\n${c.text}`).join('\n\n');
         }
       } catch (e) {
         console.warn('Could not load local cv_index.json:', e);
       }
 
+      const targetRoleName = jobTitleInput?.value.trim() || 'Software Engineer';
+      const targetCompanyName = companyInput?.value.trim() || 'Target Company';
+
       const clientPrompt = `You are an elite Tech Career Architect tailoring Thananjayan Aruljothy's CV for a specific Job Description.
+
+STRICT ANTI-HALLUCINATION & EVIDENCE-BASED GROUNDING RULES (HIGHEST PRIORITY):
+0. ZERO FABRICATION:
+   - ONLY list skills, tools, languages, and domain experience that EXPLICITLY appear in RETRIEVED CANDIDATE CONTEXT below.
+   - NEVER copy unfamiliar JD requirements or employer industries (such as "maritime software", "maritime operations", "offline functionality", "data synchronization", "Kubernetes", "AWS Lambda", "Java", "C#") into his targetTitle, summary, Core Skills, or Flipick experience!
+   - Any JD skills/domains Thananjayan does NOT currently possess go ONLY inside "Growing Into / Domain Alignment" and "additionalLearning", clearly framed as learning/expanding into.
 
 STRICT FACTUAL GUARDRAILS:
 1. Candidate: Thananjayan Aruljothy
 2. Primary Role: Flipick (April 2023 – Present), AI Full Stack Engineer / AI Developer (India — Remote).
    STRICT TITLE RULE: Thananjayan has ~3+ years experience. DO NOT label him 'Senior Software Engineer' (SSE), 'Senior Developer', or 'Lead' in his title.
-   targetTitle MUST start with either:
-   - 'FULLSTACK AI ENGINEER' (if JD emphasizes LLMs, RAG, GenAI apps)
-   - 'PYTHON ENGINEER' or 'PYTHON BACKEND ENGINEER' (if JD emphasizes Python/Flask/APIs)
-   - 'FULLSTACK ENGINEER' (if JD emphasizes full-stack web applications)
-   - 'AI BUILDER' (if JD emphasizes hands-on shipping of AI tools)
-   followed by a matching domain subtitle (e.g. 'FULLSTACK AI ENGINEER | AI-POWERED SOLUTIONS & CLOUD ARCHITECTURE'). NEVER use 'SENIOR' or 'LEAD' in this title.
+   targetTitle MUST start with 'FULLSTACK AI ENGINEER', 'PYTHON ENGINEER', 'FULLSTACK ENGINEER', or 'AI BUILDER', followed by a subtitle of ONLY his VERIFIED tech stack relevant to the JD (e.g. 'FULLSTACK AI ENGINEER | PYTHON, LLM APIS & CLOUD DEPLOYMENT'). NEVER put 'SENIOR', 'LEAD', or unfamiliar JD industries like 'MARITIME SOFTWARE'.
 3. Cloud: Strictly AWS EC2 (Ubuntu/Linux, Gunicorn, Nginx reverse proxy). NEVER claim AWS Lambda or Kubernetes.
 4. AI Capabilities: Multi-LLM APIs (OpenAI, Claude, Gemini), RAG pipelines, Veo 3 / Kling video, Fabric.js canvas, ElevenLabs TTS, D-ID avatars, Python Flask backends.
 5. Salesforce: Trailhead Ranger with 10 Superbadges (self-directed learning, not commercial certification).
 6. Return ONLY a valid JSON object matching the requested schema.
 
-TARGET ROLE: ${jobTitleInput?.value.trim() || 'AI Full-Stack Engineer / AI Builder'}
-TARGET COMPANY: ${companyInput?.value.trim() || 'Target Company'}
+TARGET ROLE TO APPLY FOR: ${targetRoleName}
+TARGET COMPANY: ${targetCompanyName}
 
 === JOB DESCRIPTION ===
 ${jd}
@@ -573,29 +577,46 @@ ${cvContext}
 
 Generate JSON matching this exact structure:
 {
-  "targetTitle": "Authentic title starting with FULLSTACK AI ENGINEER, PYTHON ENGINEER, FULLSTACK ENGINEER, or AI BUILDER + domain subtitle. NO 'SENIOR' or 'LEAD'.",
-  "summary": "Tailored 4-line professional summary addressing JD pain points.",
+  "targetTitle": "Authentic title starting with FULLSTACK AI ENGINEER, PYTHON ENGINEER, FULLSTACK ENGINEER, or AI BUILDER + subtitle of ONLY his verified stack. NO 'SENIOR', 'LEAD', or unfamiliar JD domains.",
+  "summary": "Compelling 4-line summary strictly grounded in verified indexed CV facts. Never claim unfamiliar JD domain experience.",
   "coreSkills": [
-    { "category": "Domain", "skills": "Skills matching JD" }
+    { "category": "Primary Domain (Verified)", "skills": "ONLY verified skills from indexed CV most relevant to JD (never copy unverified JD responsibilities)" },
+    { "category": "LLM & Agentic Integration", "skills": "OpenAI, Claude, Gemini APIs, RAG document Q&A, prompt engineering" },
+    { "category": "APIs & Data Handling", "skills": "REST APIs, JSON/XML, PDF/PPTX processing" },
+    { "category": "Programming & Backend", "skills": "Python, Flask, JavaScript, Fabric.js, Git" },
+    { "category": "Cloud & Infrastructure", "skills": "AWS EC2, Linux/Ubuntu Server, Gunicorn, Nginx" },
+    { "category": "Growing Into / Domain Alignment", "skills": "1-2 unfamiliar JD skills/domains he is expanding into" }
   ],
   "tailoredFlipickExperience": [
-    "4-5 high impact bullet points matching JD requirements"
+    "4-5 grounded bullet points strictly based on verified Flipick work without inventing JD-domain claims or fake metrics"
   ],
   "tailoredProjects": [
-    { "name": "AI-Powered Course Content Generation Platform", "subtitle": "Python / Flask / RAG / PPTX & SCORM", "bullets": ["1-2 bullets"] },
-    { "name": "AI Cinematic Video Generation & Editing Platform", "subtitle": "Google Veo 3 / Kling / In-App Video Editor", "bullets": ["1-2 bullets"] },
-    { "name": "AI RAG Knowledge Base & Document Intelligence", "subtitle": "Python / LLM / Vector Retrieval", "bullets": ["1-2 bullets"] }
+    { "name": "AI-Powered Course Content Generation Platform", "subtitle": "Python / Flask / RAG / PPTX & SCORM", "bullets": ["1-2 grounded bullets"] },
+    { "name": "AI Cinematic Video Generation & Editing Platform", "subtitle": "Google Veo 3 / Gemini / In-App Video Editor", "bullets": ["1-2 grounded bullets"] },
+    { "name": "AI RAG Knowledge Base & Document Intelligence", "subtitle": "Python / Flask / OpenAI Embeddings / Vector Retrieval", "bullets": ["1-2 grounded bullets"] }
   ],
   "additionalLearning": [
-    "Studying domain practices matching JD",
+    "Studying domain practices relevant to JD",
     "Exploring formal AI evaluation frameworks",
     "Salesforce platform development (Trailhead Ranger, 10 Superbadges completed) — Flow automation and process design"
   ],
+  "coverLetter": {
+    "salutation": "Dear Hiring Team,",
+    "subject": "RE: Application for ${targetRoleName}",
+    "paragraphs": [
+      "I am writing to express my strong enthusiasm for the ${targetRoleName} position at ${targetCompanyName}...",
+      "Paragraph highlighting relevant verified Flipick experience...",
+      "Paragraph highlighting relevant AI/backend projects and AWS EC2 deployment...",
+      "Paragraph noting BIT degree and continuous learning...",
+      "Closing paragraph welcoming an interview for ${targetCompanyName}."
+    ],
+    "signoff": "Sincerely,\\nThananjayan Aruljothy\\nFullstack AI Engineer"
+  },
   "matchAnalysis": {
-    "matchScore": 92,
-    "matchedKeywords": ["Keyword1", "Keyword2", "Keyword3"],
-    "keyStrengths": ["Strength 1", "Strength 2"],
-    "customPitch": "2-sentence outreach pitch"
+    "matchScore": 85,
+    "matchedKeywords": ["Verified Keyword1", "Verified Keyword2", "Verified Keyword3"],
+    "keyStrengths": ["Strength 1 grounded in indexed CV", "Strength 2 grounded in indexed CV"],
+    "customPitch": "2-sentence outreach pitch grounded in verified experience"
   }
 }`;
 
